@@ -1,4 +1,5 @@
 import './globals.css'
+import FontInjector from '@/components/shared/FontInjector'
 
 export const metadata = {
   title: 'SSF Poonoor',
@@ -8,7 +9,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ml">
-      <head />
+      <head>
+        <FontInjector />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   )

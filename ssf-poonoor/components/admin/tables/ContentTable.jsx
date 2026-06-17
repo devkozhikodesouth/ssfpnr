@@ -13,15 +13,15 @@ const SORTS = [
   { value: 'most-viewed', label: 'Most viewed' },
 ]
 
-function sortItems(items, key) {
+function sortItems(items, key, titleField) {
   const arr = [...items]
   switch (key) {
     case 'oldest':
       return arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     case 'title-asc':
-      return arr.sort((a, b) => (a.title || '').localeCompare(b.title || ''))
+      return arr.sort((a, b) => (a[titleField] || '').localeCompare(b[titleField] || ''))
     case 'title-desc':
-      return arr.sort((a, b) => (b.title || '').localeCompare(a.title || ''))
+      return arr.sort((a, b) => (b[titleField] || '').localeCompare(a[titleField] || ''))
     case 'most-viewed':
       return arr.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
     case 'newest':
@@ -42,6 +42,7 @@ function categoryName(item) {
  */
 export default function ContentTable({ module, items: initial }) {
   const config = getModuleConfig(module)
+  const titleField = config.titleField || 'title'
   const router = useRouter()
 
   const [items, setItems] = useState(initial)
@@ -52,9 +53,9 @@ export default function ContentTable({ module, items: initial }) {
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const filtered = q ? items.filter((i) => (i.title || '').toLowerCase().includes(q)) : items
-    return sortItems(filtered, sort)
-  }, [items, query, sort])
+    const filtered = q ? items.filter((i) => (i[titleField] || '').toLowerCase().includes(q)) : items
+    return sortItems(filtered, sort, titleField)
+  }, [items, query, sort, titleField])
 
   const allChecked = visible.length > 0 && visible.every((i) => selected.includes(i._id))
 
@@ -165,7 +166,7 @@ export default function ContentTable({ module, items: initial }) {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-white font-medium">{item.title}</p>
+                    <p className="text-white font-medium">{item[titleField]}</p>
                     <p className="text-gray-500 text-xs">{item.slug}</p>
                   </td>
                   <td className="px-4 py-3 text-gray-300">{categoryName(item) || <span className="text-gray-600">—</span>}</td>
@@ -186,7 +187,7 @@ export default function ContentTable({ module, items: initial }) {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(item._id, item.title)}
+                        onClick={() => handleDelete(item._id, item[titleField])}
                         disabled={busy}
                         className="px-3 py-1 text-xs bg-red-950 hover:bg-red-900 disabled:opacity-50 text-red-300 rounded transition-colors"
                       >

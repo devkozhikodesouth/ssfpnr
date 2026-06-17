@@ -7,6 +7,8 @@ require('../models/News')
 require('../models/Blog')
 require('../models/Video')
 require('../models/Gallery')
+require('../models/Event')
+require('../models/Campaign')
 
 const PER_MODULE_LIMIT = 20
 

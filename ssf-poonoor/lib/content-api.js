@@ -6,6 +6,7 @@ import connectDB from '@/lib/db'
 import Category from '@/models/Category'
 import { generateUniqueSlug } from '@/lib/slugify'
 import sanitizeCss from '@/lib/css-sanitizer'
+import { logAction } from '@/lib/audit'
 
 const MAX_CSS_BYTES = 50 * 1024
 
@@ -166,6 +167,7 @@ export function makeCreateHandler({ Model, permissionPrefix, hasCustomCss = fals
       if (body.visibility?.isPublished) body.publishedAt = new Date()
 
       const doc = await Model.create(body)
+      await logAction(request, { action: 'create', module: permissionPrefix, itemId: doc._id, after: doc })
       return NextResponse.json({ success: true, data: doc }, { status: 201 })
     } catch (err) {
       return errResponse(err)
@@ -173,11 +175,13 @@ export function makeCreateHandler({ Model, permissionPrefix, hasCustomCss = fals
   }
 }
 
-export function makeGetOneHandler({ Model }) {
+export function makeGetOneHandler({ Model, populate }) {
   return async function GET(_request, { params }) {
     try {
       await connectDB()
-      const doc = await Model.findById(params.id).lean()
+      let query = Model.findById(params.id)
+      for (const p of populate ?? []) query = query.populate(p)
+      const doc = await query.lean()
       if (!doc) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
       return NextResponse.json({ success: true, data: doc })
     } catch (err) {
@@ -204,6 +208,7 @@ export function makeUpdateHandler({ Model, permissionPrefix, hasCustomCss = fals
       const doc = await Model.findById(params.id)
       if (!doc) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
 
+      const before = doc.toObject()
       const wasPublished = doc.visibility?.isPublished
 
       // Regenerate slug only when explicitly changed, keeping it unique.
@@ -222,6 +227,7 @@ export function makeUpdateHandler({ Model, permissionPrefix, hasCustomCss = fals
       doc.set(body)
       await doc.save()
 
+      await logAction(request, { action: 'update', module: permissionPrefix, itemId: doc._id, before, after: doc })
       return NextResponse.json({ success: true, data: doc })
     } catch (err) {
       return errResponse(err)
@@ -230,7 +236,7 @@ export function makeUpdateHandler({ Model, permissionPrefix, hasCustomCss = fals
 }
 
 export function makeDeleteHandler({ Model, permissionPrefix }) {
-  return async function DELETE(_request, { params }) {
+  return async function DELETE(request, { params }) {
     try {
       const session = await getServerSession(authOptions)
       requirePermission(session, `${permissionPrefix}.delete`)
@@ -242,6 +248,13 @@ export function makeDeleteHandler({ Model, permissionPrefix }) {
         { new: true }
       )
       if (!doc) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
+
+      await logAction(request, {
+        action: 'delete',
+        module: permissionPrefix,
+        itemId: doc._id,
+        after: { isDeleted: true, deletedAt: doc.deletedAt, deletedBy: doc.deletedBy },
+      })
       return NextResponse.json({ success: true, data: { id: params.id } })
     } catch (err) {
       return errResponse(err)

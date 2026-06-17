@@ -3,8 +3,12 @@
 // field for a module happens in exactly one place — no per-module duplication.
 //
 // Field types understood by ContentForm:
-//   text · textarea · url · select · slug · image · images · richtext · css
-//   category · categories · author · speakers · tags · seo · visibility
+//   text · textarea · url · number · select · slug · image · images · file
+//   richtext · css · category · categories · author · speakers · tags
+//   linkedItems · date · boolean · seo · visibility
+//
+// `titleField` (default 'title') tells the shared ContentTable which field to
+// display/search/sort by — Downloads uses 'name' instead of 'title'.
 
 const LANGUAGE_OPTIONS = [
   { value: 'ml', label: 'Malayalam' },
@@ -99,6 +103,71 @@ export const CONTENT_MODULES = {
       { name: 'images', type: 'images', label: 'Images', folder: 'gallery' },
       { name: 'categoryId', type: 'category', label: 'Category', required: true },
       { name: 'secondaryCategories', type: 'categories', label: 'Secondary Categories' },
+      { name: 'seo', type: 'seo' },
+      { name: 'visibility', type: 'visibility' },
+    ],
+  },
+
+  campaigns: {
+    label: 'Campaigns',
+    singular: 'Campaign',
+    apiBase: '/api/campaigns',
+    basePath: '/app/campaigns',
+    appliesTo: 'campaign',
+    fields: [
+      { name: 'title', type: 'text', label: 'Title', required: true },
+      { name: 'slug', type: 'slug', label: 'Slug', from: 'title' },
+      { name: 'bannerImage', type: 'image', label: 'Banner Image', folder: 'campaigns' },
+      { name: 'categoryId', type: 'category', label: 'Category' },
+      { name: 'fromDate', type: 'date', label: 'From Date' },
+      { name: 'toDate', type: 'date', label: 'To Date' },
+      { name: 'isActive', type: 'boolean', label: 'Active', default: true },
+      { name: 'content', type: 'richtext', label: 'Content' },
+      { name: 'linkedItems', type: 'linkedItems', label: 'Linked Items' },
+      { name: 'customCss', type: 'css', label: 'Custom CSS' },
+      { name: 'seo', type: 'seo' },
+      { name: 'visibility', type: 'visibility' },
+    ],
+  },
+
+  events: {
+    label: 'Events',
+    singular: 'Event',
+    apiBase: '/api/events',
+    basePath: '/app/events',
+    appliesTo: 'event',
+    fields: [
+      { name: 'title', type: 'text', label: 'Title', required: true },
+      { name: 'slug', type: 'slug', label: 'Slug', from: 'title' },
+      { name: 'image', type: 'image', label: 'Image', folder: 'events' },
+      { name: 'categoryId', type: 'category', label: 'Category' },
+      { name: 'fromDate', type: 'date', label: 'From Date' },
+      { name: 'toDate', type: 'date', label: 'To Date' },
+      { name: 'location', type: 'text', label: 'Location' },
+      { name: 'venue', type: 'text', label: 'Venue' },
+      { name: 'registrationLink', type: 'url', label: 'Registration Link' },
+      { name: 'capacity', type: 'number', label: 'Capacity' },
+      { name: 'content', type: 'richtext', label: 'Content' },
+      { name: 'linkedItems', type: 'linkedItems', label: 'Linked Items' },
+      { name: 'customCss', type: 'css', label: 'Custom CSS' },
+      { name: 'seo', type: 'seo' },
+      { name: 'visibility', type: 'visibility' },
+    ],
+  },
+
+  downloads: {
+    label: 'Downloads',
+    singular: 'Download',
+    apiBase: '/api/downloads',
+    basePath: '/app/downloads',
+    appliesTo: 'download',
+    titleField: 'name',
+    fields: [
+      { name: 'name', type: 'text', label: 'Name', required: true },
+      { name: 'slug', type: 'slug', label: 'Slug', from: 'name' },
+      { name: 'file', type: 'file', label: 'File', folder: 'downloads' },
+      { name: 'categoryId', type: 'category', label: 'Category' },
+      { name: 'requiresAuth', type: 'boolean', label: 'Requires Login to Download' },
       { name: 'seo', type: 'seo' },
       { name: 'visibility', type: 'visibility' },
     ],

@@ -7,10 +7,61 @@ import { slugify } from '@/lib/slugify'
 import { inputClass, labelClass } from './field-styles'
 import CategorySelect from './CategorySelect'
 import ImageUploader from './ImageUploader'
+import LinkedItemsPicker from './LinkedItemsPicker'
 import SeoFields from './SeoFields'
 import VisibilityFields from './VisibilityFields'
 import RichTextEditor from '@/components/admin/editor/RichTextEditor'
 import CssEditor from '@/components/admin/editor/CssEditor'
+
+/** Inline raw-file (PDF/doc) uploader for the Download module's `file` field. */
+function FileField({ label, value, onUploaded, folder }) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError('')
+    setBusy(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('folder', folder || 'downloads')
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Upload failed')
+      onUploaded({ url: json.data.url, fileType: json.data.format || file.type, fileSize: json.data.bytes || file.size })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+      e.target.value = ''
+    }
+  }
+
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+      <div className="flex gap-2 items-center">
+        <input
+          type="url"
+          value={value || ''}
+          onChange={(e) => onUploaded({ url: e.target.value })}
+          placeholder="https://… or upload a file"
+          className={inputClass}
+        />
+        <label className="flex-shrink-0">
+          <span className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg cursor-pointer inline-block whitespace-nowrap">
+            {busy ? '…' : 'Upload'}
+          </span>
+          <input type="file" onChange={handleChange} disabled={busy} className="hidden" />
+        </label>
+      </div>
+      {value && <p className="text-gray-500 text-xs mt-1 break-all">{value}</p>}
+      {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+    </div>
+  )
+}
 
 function defaultFor(field) {
   switch (field.type) {
@@ -21,6 +72,10 @@ function defaultFor(field) {
       return []
     case 'author':
       return Object.fromEntries((field.subFields || []).map((k) => [k, '']))
+    case 'linkedItems':
+      return { news: [], videos: [], gallery: [], blogs: [] }
+    case 'boolean':
+      return field.default ?? false
     case 'seo':
       return { metaTitle: '', metaDescription: '', metaKeywords: [], ogImage: '', canonicalUrl: '', noIndex: false }
     case 'visibility':
@@ -32,14 +87,38 @@ function defaultFor(field) {
   }
 }
 
+/** Format a Date / ISO string into the yyyy-MM-dd value an <input type=date> wants. */
+function toDateInput(value) {
+  if (!value) return ''
+  const d = new Date(value)
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10)
+}
+
+/** Reduce a possibly-populated ref array to plain id strings. */
+const toIds = (arr) => (Array.isArray(arr) ? arr.map((x) => (x && typeof x === 'object' ? x._id : x)) : [])
+
 function buildInitialState(config, initialData) {
   const state = {}
   for (const field of config.fields) {
     const existing = initialData?.[field.name]
-    if (existing !== undefined && existing !== null) {
-      state[field.name] = existing
-    } else {
+    if (existing === undefined || existing === null) {
       state[field.name] = defaultFor(field)
+      continue
+    }
+    if (field.type === 'linkedItems') {
+      // The edit API populates linked refs; collapse them back to id arrays.
+      state[field.name] = {
+        news: toIds(existing.news),
+        videos: toIds(existing.videos),
+        gallery: toIds(existing.gallery),
+        blogs: toIds(existing.blogs),
+      }
+    } else if (field.type === 'categories') {
+      state[field.name] = toIds(existing)
+    } else if (field.type === 'category') {
+      state[field.name] = existing && typeof existing === 'object' ? existing._id : existing
+    } else {
+      state[field.name] = existing
     }
   }
   return state
@@ -301,6 +380,68 @@ export default function ContentForm({ module, initialData = null }) {
           </div>
         )
       }
+
+      case 'number':
+        return (
+          <div key={field.name}>
+            <label className={labelClass}>{field.label}</label>
+            <input
+              type="number"
+              value={value === '' || value === undefined || value === null ? '' : value}
+              onChange={(e) => setField(field.name, e.target.value === '' ? '' : Number(e.target.value))}
+              className={inputClass}
+            />
+          </div>
+        )
+
+      case 'date':
+        return (
+          <div key={field.name}>
+            <label className={labelClass}>{field.label}</label>
+            <input
+              type="date"
+              value={toDateInput(value)}
+              onChange={(e) => setField(field.name, e.target.value || null)}
+              className={inputClass}
+            />
+          </div>
+        )
+
+      case 'boolean':
+        return (
+          <label key={field.name} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!!value}
+              onChange={(e) => setField(field.name, e.target.checked)}
+              className="w-4 h-4 accent-emerald-600"
+            />
+            <span className="text-sm text-gray-300">{field.label}</span>
+          </label>
+        )
+
+      case 'file':
+        return (
+          <FileField
+            key={field.name}
+            label={field.label}
+            folder={field.folder}
+            value={value}
+            onUploaded={({ url, fileType, fileSize }) =>
+              setForm((prev) => ({
+                ...prev,
+                [field.name]: url,
+                ...(fileType !== undefined ? { fileType } : {}),
+                ...(fileSize !== undefined ? { fileSize } : {}),
+              }))
+            }
+          />
+        )
+
+      case 'linkedItems':
+        return (
+          <LinkedItemsPicker key={field.name} label={field.label} value={value} onChange={(v) => setField(field.name, v)} />
+        )
 
       case 'seo':
         return <SeoFields key={field.name} value={value} onChange={(v) => setField(field.name, v)} />
