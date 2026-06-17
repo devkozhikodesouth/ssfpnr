@@ -121,6 +121,11 @@ const siteConfigSchema = new mongoose.Schema({
     address: { type: String },
     mapLink: { type: String },
   },
+  footer: {
+    text: { type: String },
+    textMl: { type: String },
+    copyright: { type: String, default: '© SSF Poonoor Division. All rights reserved.' },
+  },
   mobile: {
     bottomNavEnabled: { type: Boolean, default: true },
     bottomNavItems: {
