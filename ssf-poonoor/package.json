@@ -18,7 +18,14 @@
     "next-auth": "^4.24.7",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "cloudinary": "^2.5.1",
+    "@tiptap/react": "^2.10.3",
+    "@tiptap/pm": "^2.10.3",
+    "@tiptap/starter-kit": "^2.10.3",
+    "@tiptap/extension-link": "^2.10.3",
+    "@uiw/react-codemirror": "^4.23.7",
+    "@codemirror/lang-css": "^6.3.1"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.4",
