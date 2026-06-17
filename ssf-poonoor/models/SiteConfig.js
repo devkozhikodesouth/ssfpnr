@@ -1,0 +1,146 @@
+const mongoose = require('mongoose')
+
+const moduleConfigSchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: true },
+    label: { type: String },
+    labelMl: { type: String },
+    perPage: { type: Number, default: 12 },
+    defaultSort: { type: String, default: 'publishedAt-desc' },
+    showOnHome: { type: Boolean, default: true },
+    homeLimit: { type: Number, default: 3 },
+    navOrder: { type: Number },
+    cardStyle: { type: String },
+    showCategory: { type: Boolean, default: true },
+    showAuthor: { type: Boolean, default: true },
+    showReadTime: { type: Boolean, default: false },
+    enableSharing: { type: Boolean, default: true },
+  },
+  { _id: false }
+)
+
+const homepageSectionSchema = new mongoose.Schema(
+  {
+    type: { type: String },
+    enabled: { type: Boolean, default: true },
+    order: { type: Number },
+    config: { type: mongoose.Schema.Types.Mixed },
+  },
+  { _id: false }
+)
+
+const bottomNavItemSchema = new mongoose.Schema(
+  {
+    label: { type: String },
+    icon: { type: String },
+    path: { type: String },
+  },
+  { _id: false }
+)
+
+const siteConfigSchema = new mongoose.Schema({
+  branding: {
+    siteName: { type: String, default: 'SSF Poonoor' },
+    tagline: { type: String },
+    logo: { type: String },
+    logoLight: { type: String },
+    logoDark: { type: String },
+    favicon: { type: String },
+    ogDefaultImage: { type: String },
+  },
+  theme: {
+    primaryColor: { type: String, default: '#1a6b47' },
+    secondaryColor: { type: String, default: '#0f4a30' },
+    accentColor: { type: String, default: '#c9a84c' },
+    backgroundDark: { type: String, default: '#141414' },
+    backgroundLight: { type: String, default: '#ffffff' },
+    textPrimary: { type: String, default: '#1a1a1a' },
+    textSecondary: { type: String, default: '#6b7280' },
+    headingFont: { type: String, default: 'Inter' },
+    bodyFont: { type: String, default: 'Inter' },
+    arabicFont: { type: String, default: 'Inter' },
+    fontSize: {
+      base: { type: String, default: '16px' },
+      scale: { type: Number, default: 1.25 },
+    },
+  },
+  layout: {
+    headerStyle: { type: String, default: 'classic', enum: ['classic', 'minimal', 'centered'] },
+    footerStyle: { type: String, default: 'classic', enum: ['classic', 'minimal', 'expanded'] },
+    cardStyle: { type: String, default: 'shadow', enum: ['shadow', 'border', 'flat'] },
+    radius: { type: String, default: 'soft', enum: ['sharp', 'soft', 'pill'] },
+  },
+  modules: {
+    news: { type: moduleConfigSchema, default: () => ({ label: 'News', labelMl: 'വാർത്തകൾ', navOrder: 1, showReadTime: true }) },
+    gallery: { type: moduleConfigSchema, default: () => ({ label: 'Gallery', labelMl: 'ഗാലറി', navOrder: 2, showAuthor: false }) },
+    video: { type: moduleConfigSchema, default: () => ({ label: 'Videos', labelMl: 'വീഡിയോ', navOrder: 3, showAuthor: false }) },
+    blogs: { type: moduleConfigSchema, default: () => ({ label: 'Blogs', labelMl: 'ബ്ലോഗ്', navOrder: 4, showReadTime: true }) },
+    campaigns: { type: moduleConfigSchema, default: () => ({ label: 'Campaigns', labelMl: 'കാമ്പെയ്‌നുകൾ', navOrder: 5, showAuthor: false }) },
+    events: { type: moduleConfigSchema, default: () => ({ label: 'Events', labelMl: 'ഇവന്റുകൾ', navOrder: 6, showAuthor: false }) },
+    downloads: { type: moduleConfigSchema, default: () => ({ label: 'Downloads', labelMl: 'ഡൗൺലോഡ്', navOrder: 7, showAuthor: false }) },
+  },
+  homepage: {
+    sections: {
+      type: [homepageSectionSchema],
+      default: () => [
+        { type: 'hero', enabled: true, order: 1 },
+        { type: 'about', enabled: true, order: 2 },
+        { type: 'campaigns', enabled: true, order: 3, config: { limit: 4 } },
+        { type: 'news', enabled: true, order: 4, config: { limit: 3 } },
+        { type: 'videos', enabled: true, order: 5, config: { limit: 3 } },
+        { type: 'gallery', enabled: true, order: 6, config: { limit: 8 } },
+        { type: 'blogs', enabled: true, order: 7, config: { limit: 3 } },
+        { type: 'events', enabled: true, order: 8, config: { limit: 4 } },
+        { type: 'newsletter', enabled: false, order: 9 },
+      ],
+    },
+  },
+  seo: {
+    defaultTitle: { type: String, default: 'SSF Poonoor' },
+    titleTemplate: { type: String, default: '%s | SSF Poonoor' },
+    defaultDescription: { type: String },
+    defaultKeywords: [{ type: String }],
+    googleAnalyticsId: { type: String },
+    googleSearchConsoleId: { type: String },
+    facebookAppId: { type: String },
+    twitterHandle: { type: String },
+    sitemapEnabled: { type: Boolean, default: true },
+    robotsTxtCustom: { type: String },
+  },
+  social: {
+    facebook: { type: String },
+    instagram: { type: String },
+    youtube: { type: String },
+    twitter: { type: String },
+    telegram: { type: String },
+    whatsapp: { type: String },
+  },
+  contact: {
+    email: { type: String },
+    phone: { type: String },
+    address: { type: String },
+    mapLink: { type: String },
+  },
+  mobile: {
+    bottomNavEnabled: { type: Boolean, default: true },
+    bottomNavItems: {
+      type: [bottomNavItemSchema],
+      default: () => [
+        { label: 'Home', icon: 'home', path: '/' },
+        { label: 'News', icon: 'newspaper', path: '/news' },
+        { label: 'Gallery', icon: 'image', path: '/gallery' },
+        { label: 'More', icon: 'menu', path: '#menu' },
+      ],
+    },
+  },
+  performance: {
+    enableISR: { type: Boolean, default: true },
+    revalidateSeconds: { type: Number, default: 60 },
+    imageQuality: { type: Number, default: 75 },
+    lazyLoadImages: { type: Boolean, default: true },
+  },
+})
+
+const SiteConfig = mongoose.models.SiteConfig || mongoose.model('SiteConfig', siteConfigSchema)
+
+module.exports = SiteConfig

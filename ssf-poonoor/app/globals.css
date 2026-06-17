@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1a6b47;
+  --color-secondary: #0f4a30;
+  --color-accent: #c9a84c;
+  --bg-dark: #141414;
+  --bg-light: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --font-heading: 'Inter', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-arabic: 'Inter', serif;
+  --radius: 0.5rem;
+}
