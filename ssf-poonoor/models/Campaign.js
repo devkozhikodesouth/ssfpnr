@@ -38,4 +38,8 @@ campaignSchema.plugin(sortSchemaPlugin)
 campaignSchema.plugin(auditSchemaPlugin)
 campaignSchema.plugin(softDeletePlugin)
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+campaignSchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+campaignSchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 module.exports = mongoose.models.Campaign || mongoose.model('Campaign', campaignSchema)

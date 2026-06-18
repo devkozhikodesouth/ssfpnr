@@ -45,4 +45,8 @@ blogSchema.pre('save', function (next) {
   next()
 })
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+blogSchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+blogSchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 module.exports = mongoose.models.Blog || mongoose.model('Blog', blogSchema)

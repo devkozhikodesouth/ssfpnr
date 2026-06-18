@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { categorySchema, collectErrors } from '@/lib/validation'
 
 const MODULE_OPTIONS = ['news', 'video', 'gallery', 'blog', 'event', 'campaign', 'download']
 
@@ -35,7 +36,10 @@ export default function CategoryForm({ initialData = null }) {
   })
   const [slugManual, setSlugManual] = useState(isEdit)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
   const [loading, setLoading] = useState(false)
+
+  const err = (name) => fieldErrors[name]
 
   function handleNameChange(e) {
     const name = e.target.value
@@ -63,6 +67,15 @@ export default function CategoryForm({ initialData = null }) {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+
+    const errors = collectErrors(categorySchema, form)
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors)
+      setError('Please fix the highlighted fields.')
+      return
+    }
+    setFieldErrors({})
+
     setLoading(true)
 
     try {
@@ -107,6 +120,7 @@ export default function CategoryForm({ initialData = null }) {
             placeholder="e.g. Sahityotsav 26"
             className={input}
           />
+          {err('name') && <p className="text-red-400 text-xs mt-1">{err('name')}</p>}
         </div>
         <div>
           <label className={label}>Slug *</label>
@@ -118,6 +132,7 @@ export default function CategoryForm({ initialData = null }) {
             placeholder="e.g. sahityotsav-26"
             className={input}
           />
+          {err('slug') && <p className="text-red-400 text-xs mt-1">{err('slug')}</p>}
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getModuleConfig } from '@/components/admin/content-configs'
+import { getModuleSchema, collectErrors } from '@/lib/validation'
 import { slugify } from '@/lib/slugify'
 import { inputClass, labelClass } from './field-styles'
 import CategorySelect from './CategorySelect'
@@ -87,6 +88,12 @@ function defaultFor(field) {
   }
 }
 
+/** Inline validation message shown beneath a field. Renders nothing when valid. */
+function FieldError({ msg }) {
+  if (!msg) return null
+  return <p className="text-red-400 text-xs mt-1">{msg}</p>
+}
+
 /** Format a Date / ISO string into the yyyy-MM-dd value an <input type=date> wants. */
 function toDateInput(value) {
   if (!value) return ''
@@ -134,12 +141,15 @@ export default function ContentForm({ module, initialData = null }) {
   const router = useRouter()
   const isEdit = !!initialData
 
+  const schema = getModuleSchema(module)
   const [form, setForm] = useState(() => buildInitialState(config, initialData))
   const [slugManual, setSlugManual] = useState(isEdit)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
   const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }))
+  const err = (name) => fieldErrors[name]
 
   function handleTitleLikeChange(field, value) {
     setForm((prev) => {
@@ -153,6 +163,16 @@ export default function ContentForm({ module, initialData = null }) {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+
+    // Client-side validation against the module's zod schema (lib/validation).
+    const errors = collectErrors(schema, form)
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors)
+      setError('Please fix the highlighted fields.')
+      return
+    }
+    setFieldErrors({})
+
     setLoading(true)
     try {
       const url = isEdit ? `${config.apiBase}/${initialData._id}` : config.apiBase
@@ -197,6 +217,7 @@ export default function ContentForm({ module, initialData = null }) {
               }
               className={inputClass}
             />
+            <FieldError msg={err(field.name)} />
           </div>
         )
 
@@ -214,6 +235,7 @@ export default function ContentForm({ module, initialData = null }) {
               placeholder="auto-generated from title"
               className={inputClass}
             />
+            <FieldError msg={err(field.name)} />
           </div>
         )
 
@@ -269,14 +291,16 @@ export default function ContentForm({ module, initialData = null }) {
 
       case 'category':
         return (
-          <CategorySelect
-            key={field.name}
-            label={field.label}
-            appliesTo={config.appliesTo}
-            required={field.required}
-            value={value}
-            onChange={(v) => setField(field.name, v)}
-          />
+          <div key={field.name}>
+            <CategorySelect
+              label={field.label}
+              appliesTo={config.appliesTo}
+              required={field.required}
+              value={value}
+              onChange={(v) => setField(field.name, v)}
+            />
+            <FieldError msg={err(field.name)} />
+          </div>
         )
 
       case 'categories':
@@ -391,6 +415,7 @@ export default function ContentForm({ module, initialData = null }) {
               onChange={(e) => setField(field.name, e.target.value === '' ? '' : Number(e.target.value))}
               className={inputClass}
             />
+            <FieldError msg={err(field.name)} />
           </div>
         )
 

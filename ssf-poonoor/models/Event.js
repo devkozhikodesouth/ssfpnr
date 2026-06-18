@@ -60,6 +60,10 @@ eventSchema.plugin(sortSchemaPlugin)
 eventSchema.plugin(auditSchemaPlugin)
 eventSchema.plugin(softDeletePlugin)
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+eventSchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+eventSchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 const Event = mongoose.models.Event || mongoose.model('Event', eventSchema)
 
 module.exports = Event

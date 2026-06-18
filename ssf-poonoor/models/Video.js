@@ -37,4 +37,8 @@ videoSchema.plugin(sortSchemaPlugin)
 videoSchema.plugin(auditSchemaPlugin)
 videoSchema.plugin(softDeletePlugin)
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+videoSchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+videoSchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 module.exports = mongoose.models.Video || mongoose.model('Video', videoSchema)

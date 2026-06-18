@@ -1,0 +1,58 @@
+# Root-level safety net for the whole repository. The Next.js app keeps its own
+# ssf-poonoor/.gitignore; these patterns (no leading slash) also apply at any
+# depth, so they protect the repo root and any subproject.
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs / Next.js
+.next/
+out/
+build/
+dist/
+
+# Environment files — never commit secrets, but keep *.example templates
+.env
+.env.*
+!.env*.example
+
+# Vercel
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Temp / scratch (e.g. one-off verification scripts)
+*.tmp
+*.tmp.js
+*.bak
+
+# TypeScript / build info
+*.tsbuildinfo
+next-env.d.ts
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude — keep shared settings.json, ignore personal/local overrides
+.claude/settings.local.json
+.claude/**/settings.local.json
+
+# Environment files — never commit secrets, but keep *.example templates
+.env
+.env.*
+!.env*.example

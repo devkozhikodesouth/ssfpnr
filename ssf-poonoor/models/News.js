@@ -44,4 +44,8 @@ newsSchema.pre('save', function (next) {
   next()
 })
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+newsSchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+newsSchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 module.exports = mongoose.models.News || mongoose.model('News', newsSchema)

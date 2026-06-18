@@ -29,6 +29,9 @@ categorySchema.plugin(softDeletePlugin)
 categorySchema.plugin(auditSchemaPlugin)
 categorySchema.plugin(visibilitySchemaPlugin)
 
+// Standalone category pages + navbar/homepage featured lookups (PLAN §22).
+categorySchema.index({ isStandalone: 1, isFeatured: 1 })
+
 const Category = mongoose.models.Category || mongoose.model('Category', categorySchema)
 
 module.exports = Category

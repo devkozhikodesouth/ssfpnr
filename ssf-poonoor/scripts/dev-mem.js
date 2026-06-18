@@ -33,7 +33,7 @@ async function main() {
   }
 
   console.log('\nStarting Next.js dev server...');
-  const nextDev = spawn('npm', ['run', 'dev'], {
+  const nextDev = spawn('node', ['--no-turbo-fast-api-calls', 'node_modules/next/dist/bin/next', 'dev'], {
     stdio: 'inherit',
     shell: true,
     env: process.env

@@ -1,5 +1,6 @@
 const connectDB = require('./db')
 const { resolvePermissions } = require('./permissions')
+const { rateLimit, clientIp } = require('./rate-limit')
 
 function getModels() {
   return {
@@ -20,8 +21,14 @@ const authOptions = {
         username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.username || !credentials?.password) return null
+
+        // Soft brute-force guard: 10 attempts / minute / IP (lib/rate-limit).
+        const { allowed } = rateLimit('auth', clientIp(req))
+        if (!allowed) {
+          throw new Error('Too many login attempts. Please try again in a minute.')
+        }
 
         await connectDB()
         const { User } = getModels()

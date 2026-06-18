@@ -10,12 +10,10 @@ out/
 # Production build
 build/
 
-# Environment files — never commit secrets
+# Environment files — never commit secrets, but keep *.example templates
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env*.example
 
 # Debug logs
 npm-debug.log*
@@ -40,3 +38,11 @@ Desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Temp / scratch (e.g. one-off verification scripts)
+*.tmp
+*.tmp.js
+*.bak
+
+# Test coverage
+coverage/

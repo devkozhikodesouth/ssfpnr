@@ -35,4 +35,8 @@ gallerySchema.plugin(sortSchemaPlugin)
 gallerySchema.plugin(auditSchemaPlugin)
 gallerySchema.plugin(softDeletePlugin)
 
+// Composite indexes for the common public-list and category queries (PLAN §22).
+gallerySchema.index({ 'visibility.isPublished': 1, isDeleted: 1, publishedAt: -1 })
+gallerySchema.index({ categoryId: 1, 'visibility.isPublished': 1 })
+
 module.exports = mongoose.models.Gallery || mongoose.model('Gallery', gallerySchema)
