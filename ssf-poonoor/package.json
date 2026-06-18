@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "verify:db": "node scripts/verify-db.js",
+    "verify:cloudinary": "node scripts/verify-cloudinary.js",
     "test": "node --test \"tests/*.test.js\"",
     "seed": "node scripts/seed.js",
     "seed:categories": "node scripts/seed-categories.js",
