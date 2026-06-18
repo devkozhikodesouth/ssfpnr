@@ -6,21 +6,45 @@ import RelatedItems from '@/components/public/RelatedItems'
 import ViewTracker from '@/components/public/ViewTracker'
 import CustomCssScope from '@/components/public/CustomCssScope'
 import CategoryBadge from '@/components/public/cards/CategoryBadge'
-import { fetchPublicItem, fetchRelated } from '@/lib/public-content'
+import JsonLd from '@/components/public/seo/JsonLd'
+import { fetchPublicItem, fetchRelated, getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, buildJsonLd, MODULE_SCHEMA_TYPE } from '@/lib/seo'
 import { youTubeId, formatDate } from '@/lib/format'
+import { REVALIDATE_SECONDS } from '@/lib/perf'
 
-export const dynamic = 'force-dynamic'
+// ISR — detail pages read only `params`; TTL from a constant, no per-request DB hit.
+export const revalidate = REVALIDATE_SECONDS
+
+export async function generateMetadata({ params }) {
+  const [item, siteConfig] = await Promise.all([fetchPublicItem('video', params.slug), getSiteConfig()])
+  if (!item) return {}
+  return buildMetadata({ item, siteConfig, type: 'article', path: `/video/${params.slug}` })
+}
 
 export default async function VideoDetailPage({ params }) {
   await ensureModuleEnabled('video')
   const item = await fetchPublicItem('video', params.slug)
   if (!item) notFound()
 
-  const related = await fetchRelated('video', { categoryId: item.categoryId?._id, excludeId: item._id })
+  const [related, siteConfig] = await Promise.all([
+    fetchRelated('video', { categoryId: item.categoryId?._id, excludeId: item._id }),
+    getSiteConfig(),
+  ])
   const vid = youTubeId(item.youTubeLink)
+
+  const path = `/video/${params.slug}`
+  const jsonLd = [
+    buildJsonLd({ item, type: MODULE_SCHEMA_TYPE.video, siteConfig, path }),
+    buildJsonLd({
+      type: 'BreadcrumbList',
+      siteConfig,
+      crumbs: [{ label: 'Home', href: '/' }, { label: 'Videos', href: '/video' }, { label: item.title }],
+    }),
+  ]
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      <JsonLd data={jsonLd} />
       <ViewTracker module="video" id={item._id} />
 
       <div className="mb-4">

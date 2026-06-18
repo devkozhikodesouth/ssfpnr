@@ -9,10 +9,14 @@ import CustomCssScope from '@/components/public/CustomCssScope'
 import CategoryBadge from '@/components/public/cards/CategoryBadge'
 import LinkedItemsPanel from '@/components/public/LinkedItemsPanel'
 import Icon from '@/components/public/Icon'
-import { fetchPublicItem, fetchRelated, fetchLinkedItems } from '@/lib/public-content'
+import JsonLd from '@/components/public/seo/JsonLd'
+import { fetchPublicItem, fetchRelated, fetchLinkedItems, getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, buildJsonLd, MODULE_SCHEMA_TYPE } from '@/lib/seo'
 import { formatDate, eventStatus } from '@/lib/format'
+import { REVALIDATE_SECONDS } from '@/lib/perf'
 
-export const dynamic = 'force-dynamic'
+// ISR — detail pages read only `params`; TTL from a constant, no per-request DB hit.
+export const revalidate = REVALIDATE_SECONDS
 
 const STATUS_STYLES = {
   upcoming: 'bg-emerald-100 text-emerald-800',
@@ -20,20 +24,38 @@ const STATUS_STYLES = {
   past: 'bg-gray-100 text-gray-500',
 }
 
+export async function generateMetadata({ params }) {
+  const [item, siteConfig] = await Promise.all([fetchPublicItem('events', params.slug), getSiteConfig()])
+  if (!item) return {}
+  return buildMetadata({ item, siteConfig, type: 'article', path: `/events/${params.slug}` })
+}
+
 export default async function EventDetailPage({ params }) {
   await ensureModuleEnabled('events')
   const item = await fetchPublicItem('events', params.slug)
   if (!item) notFound()
 
-  const [related, linked] = await Promise.all([
+  const [related, linked, siteConfig] = await Promise.all([
     fetchRelated('events', { categoryId: item.categoryId?._id, excludeId: item._id }),
     fetchLinkedItems(item.linkedItems || {}),
+    getSiteConfig(),
   ])
   const status = item.status || eventStatus(item.fromDate, item.toDate)
   const range = [item.fromDate, item.toDate].filter(Boolean).map(formatDate).join(' – ')
 
+  const path = `/events/${params.slug}`
+  const jsonLd = [
+    buildJsonLd({ item, type: MODULE_SCHEMA_TYPE.events, siteConfig, path }),
+    buildJsonLd({
+      type: 'BreadcrumbList',
+      siteConfig,
+      crumbs: [{ label: 'Home', href: '/' }, { label: 'Events', href: '/events' }, { label: item.title }],
+    }),
+  ]
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      <JsonLd data={jsonLd} />
       <ViewTracker module="events" id={item._id} />
 
       <div className="mb-4">

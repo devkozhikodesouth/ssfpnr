@@ -2,9 +2,23 @@ import Breadcrumbs from '@/components/public/Breadcrumbs'
 import SectionHeader from '@/components/public/SectionHeader'
 import AboutSection from '@/components/public/home/AboutSection'
 import Icon from '@/components/public/Icon'
+import JsonLd from '@/components/public/seo/JsonLd'
 import { getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, buildJsonLd } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const siteConfig = await getSiteConfig()
+  const siteName = siteConfig?.branding?.siteName || 'SSF Poonoor'
+  return buildMetadata({
+    siteConfig,
+    title: 'About',
+    description: `About ${siteName} — the Sunni Student Federation, Poonoor Division: history, mission, leadership and wings.`,
+    path: '/about',
+    type: 'website',
+  })
+}
 
 // Semi-static About page (PLAN §15.5). Organisation copy is fixed here; contact
 // details come from SiteConfig so they stay editable in Site Setup.
@@ -26,9 +40,15 @@ export default async function AboutPage() {
   const config = await getSiteConfig()
   const siteName = config?.branding?.siteName || 'SSF Poonoor'
   const contact = config?.contact || {}
+  const breadcrumbLd = buildJsonLd({
+    type: 'BreadcrumbList',
+    siteConfig: config,
+    crumbs: [{ label: 'Home', href: '/' }, { label: 'About' }],
+  })
 
   return (
     <div>
+      <JsonLd data={breadcrumbLd} />
       {/* Hero */}
       <section className="bg-darkbg text-white">
         <div className="max-w-7xl mx-auto px-6 py-16 space-y-4">

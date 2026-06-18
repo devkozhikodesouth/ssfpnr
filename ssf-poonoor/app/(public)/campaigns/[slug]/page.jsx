@@ -8,24 +8,46 @@ import ViewTracker from '@/components/public/ViewTracker'
 import CustomCssScope from '@/components/public/CustomCssScope'
 import CategoryBadge from '@/components/public/cards/CategoryBadge'
 import LinkedItemsPanel from '@/components/public/LinkedItemsPanel'
-import { fetchPublicItem, fetchRelated, fetchLinkedItems } from '@/lib/public-content'
+import JsonLd from '@/components/public/seo/JsonLd'
+import { fetchPublicItem, fetchRelated, fetchLinkedItems, getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, buildJsonLd, MODULE_SCHEMA_TYPE } from '@/lib/seo'
 import { formatDate } from '@/lib/format'
+import { REVALIDATE_SECONDS } from '@/lib/perf'
 
-export const dynamic = 'force-dynamic'
+// ISR — detail pages read only `params`; TTL from a constant, no per-request DB hit.
+export const revalidate = REVALIDATE_SECONDS
+
+export async function generateMetadata({ params }) {
+  const [item, siteConfig] = await Promise.all([fetchPublicItem('campaigns', params.slug), getSiteConfig()])
+  if (!item) return {}
+  return buildMetadata({ item, siteConfig, type: 'article', path: `/campaigns/${params.slug}` })
+}
 
 export default async function CampaignDetailPage({ params }) {
   await ensureModuleEnabled('campaigns')
   const item = await fetchPublicItem('campaigns', params.slug)
   if (!item) notFound()
 
-  const [related, linked] = await Promise.all([
+  const [related, linked, siteConfig] = await Promise.all([
     fetchRelated('campaigns', { categoryId: item.categoryId?._id, excludeId: item._id }),
     fetchLinkedItems(item.linkedItems || {}),
+    getSiteConfig(),
   ])
   const range = [item.fromDate, item.toDate].filter(Boolean).map(formatDate).join(' – ')
 
+  const path = `/campaigns/${params.slug}`
+  const jsonLd = [
+    buildJsonLd({ item, type: MODULE_SCHEMA_TYPE.campaigns, siteConfig, path }),
+    buildJsonLd({
+      type: 'BreadcrumbList',
+      siteConfig,
+      crumbs: [{ label: 'Home', href: '/' }, { label: 'Campaigns', href: '/campaigns' }, { label: item.title }],
+    }),
+  ]
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
+      <JsonLd data={jsonLd} />
       <ViewTracker module="campaigns" id={item._id} />
 
       <div className="mb-4">

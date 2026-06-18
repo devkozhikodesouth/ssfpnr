@@ -1,7 +1,10 @@
 import Navbar from '@/components/public/layout/Navbar'
 import Footer from '@/components/public/layout/Footer'
 import BottomNav from '@/components/public/layout/BottomNav'
+import JsonLd from '@/components/public/seo/JsonLd'
+import GoogleAnalytics from '@/components/public/seo/GoogleAnalytics'
 import { getSiteConfig, getPrimaryNav, getBottomNav, getNavPaths } from '@/lib/public-content'
+import { buildJsonLd } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +23,14 @@ export default async function PublicLayout({ children }) {
   ])
 
   const branding = config?.branding || {}
+  // Site-wide Organization structured data (PLAN §13.2), injected once for the
+  // whole public portal rather than per page.
+  const organizationLd = buildJsonLd({ type: 'Organization', siteConfig: config })
 
   return (
     <div className="min-h-screen flex flex-col bg-lightbg">
+      <JsonLd data={organizationLd} />
+      <GoogleAnalytics gaId={config?.seo?.googleAnalyticsId} />
       <Navbar navItems={navItems} siteName={branding.siteName || 'SSF Poonoor'} />
       <main className="flex-grow pb-16 md:pb-0">{children}</main>
       <Footer

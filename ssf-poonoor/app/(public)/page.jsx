@@ -3,9 +3,17 @@ import AboutSection from '@/components/public/home/AboutSection'
 import FeaturedCategories from '@/components/public/home/FeaturedCategories'
 import ModuleSection from '@/components/public/home/ModuleSection'
 import Newsletter from '@/components/public/home/Newsletter'
+import JsonLd from '@/components/public/seo/JsonLd'
 import { getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, getBaseUrl } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const siteConfig = await getSiteConfig()
+  // No explicit title → uses the configured default title verbatim (no template).
+  return buildMetadata({ siteConfig, path: '/', type: 'website' })
+}
 
 // section.type → renderer. The generic ModuleSection covers all content strips
 // (CRITICAL ANTI-DUPLICATION: no hardcoded <NewsSection/><BlogSection/> stack).
@@ -25,11 +33,23 @@ export default async function HomePage() {
     .filter((s) => s.enabled !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 
+  // WebSite structured data for the home page (complements the site-wide
+  // Organization node injected in the public layout — PLAN §13.2).
+  const websiteLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: branding.siteName || 'SSF Poonoor',
+    url: `${getBaseUrl()}/`,
+    description: config?.seo?.defaultDescription || branding.tagline || undefined,
+    inLanguage: ['ml', 'en'],
+  }
+
   // Alternating light/lightbg bands across the "body" sections (mockup pattern).
   let band = 0
 
   return (
     <>
+      <JsonLd data={websiteLd} />
       {sections.map((section, i) => {
         const key = `${section.type}-${i}`
         const cfg = section.config || {}

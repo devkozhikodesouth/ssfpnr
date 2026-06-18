@@ -1,9 +1,29 @@
 import { notFound } from 'next/navigation'
 import Breadcrumbs from '@/components/public/Breadcrumbs'
 import CategoryTabs from '@/components/public/category/CategoryTabs'
+import JsonLd from '@/components/public/seo/JsonLd'
 import { aggregateForCategory } from '@/lib/category-aggregator'
+import { getSiteConfig } from '@/lib/public-content'
+import { buildMetadata, buildJsonLd } from '@/lib/seo'
+import { REVALIDATE_SECONDS } from '@/lib/perf'
 
-export const dynamic = 'force-dynamic'
+// ISR — standalone category pages read only `params`; TTL from a constant.
+export const revalidate = REVALIDATE_SECONDS
+
+export async function generateMetadata({ params }) {
+  const result = await aggregateForCategory(params.slug, { requirePublished: true })
+  if (!result) return {}
+  const siteConfig = await getSiteConfig()
+  const c = result.category
+  return buildMetadata({
+    siteConfig,
+    title: c.name,
+    description: c.description,
+    image: c.coverImage,
+    path: `/c/${params.slug}`,
+    type: 'website',
+  })
+}
 
 /**
  * Standalone category page (PLAN §5.5, §15.10). Banner + tabs aggregating all
@@ -15,6 +35,12 @@ export default async function CategoryPublicPage({ params }) {
   if (!result) notFound()
 
   const { category, news, videos, gallery, blogs, events, campaigns } = JSON.parse(JSON.stringify(result))
+  const siteConfig = await getSiteConfig()
+  const breadcrumbLd = buildJsonLd({
+    type: 'BreadcrumbList',
+    siteConfig,
+    crumbs: [{ label: 'Home', href: '/' }, { label: category.name }],
+  })
 
   const groups = [
     { key: 'news', label: 'News', type: 'news', items: news },
@@ -27,6 +53,7 @@ export default async function CategoryPublicPage({ params }) {
 
   return (
     <main>
+      <JsonLd data={breadcrumbLd} />
       {/* Banner */}
       <section className="relative bg-darkbg text-white overflow-hidden">
         {category.coverImage ? (
