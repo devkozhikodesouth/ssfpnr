@@ -1,107 +1,65 @@
 import { notFound } from 'next/navigation'
-import mongoose from 'mongoose'
-import connectDB from '@/lib/db'
-import Category from '@/models/Category'
+import Breadcrumbs from '@/components/public/Breadcrumbs'
+import CategoryTabs from '@/components/public/category/CategoryTabs'
+import { aggregateForCategory } from '@/lib/category-aggregator'
 
-async function queryModule(modelName, categoryId) {
-  const Model = mongoose.models[modelName]
-  if (!Model) return []
-  try {
-    return await Model.find({ categoryId, 'visibility.isPublished': true })
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .lean()
-  } catch {
-    return []
-  }
-}
+export const dynamic = 'force-dynamic'
 
+/**
+ * Standalone category page (PLAN §5.5, §15.10). Banner + tabs aggregating all
+ * published content linked to the category across modules. Only tabs that have
+ * content are shown. Replaces the Phase 2 skeleton.
+ */
 export default async function CategoryPublicPage({ params }) {
-  await connectDB()
+  const result = await aggregateForCategory(params.slug, { requirePublished: true })
+  if (!result) notFound()
 
-  const category = await Category.findOne({
-    slug: params.slug,
-    'visibility.isPublished': true,
-  }).lean()
+  const { category, news, videos, gallery, blogs, events, campaigns } = JSON.parse(JSON.stringify(result))
 
-  if (!category) notFound()
-
-  const [news, videos, gallery, blogs, events] = await Promise.all([
-    queryModule('News', category._id),
-    queryModule('Video', category._id),
-    queryModule('Gallery', category._id),
-    queryModule('Blog', category._id),
-    queryModule('Event', category._id),
-  ])
-
-  const tabs = [
-    { key: 'news', label: 'News', items: news },
-    { key: 'videos', label: 'Videos', items: videos },
-    { key: 'gallery', label: 'Gallery', items: gallery },
-    { key: 'blogs', label: 'Blogs', items: blogs },
-    { key: 'events', label: 'Events', items: events },
-  ].filter(t => t.items.length > 0)
+  const groups = [
+    { key: 'news', label: 'News', type: 'news', items: news },
+    { key: 'videos', label: 'Videos', type: 'videos', items: videos },
+    { key: 'gallery', label: 'Gallery', type: 'gallery', items: gallery },
+    { key: 'blogs', label: 'Blogs', type: 'blogs', items: blogs },
+    { key: 'events', label: 'Events', type: 'events', items: events },
+    { key: 'campaigns', label: 'Campaigns', type: 'campaigns', items: campaigns },
+  ].filter((g) => g.items?.length)
 
   return (
-    <main className="min-h-screen bg-white">
+    <main>
       {/* Banner */}
-      <section className="relative bg-gray-900 text-white overflow-hidden">
-        {category.coverImage && (
-          <div className="absolute inset-0">
-            <img
-              src={category.coverImage}
-              alt={category.name}
-              className="w-full h-full object-cover opacity-25"
-            />
+      <section className="relative bg-darkbg text-white overflow-hidden">
+        {category.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={category.coverImage} alt={category.name} className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/70 to-darkbg/40" />
+        {category.color ? (
+          <div className="absolute bottom-0 inset-x-0 h-1" style={{ background: category.color }} />
+        ) : null}
+        <div className="relative max-w-5xl mx-auto px-6 py-16 text-center space-y-4">
+          <div className="flex justify-center">
+            <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: category.name }]} />
           </div>
-        )}
-        {category.color && (
-          <div
-            className="absolute bottom-0 left-0 right-0 h-1"
-            style={{ background: category.color }}
-          />
-        )}
-        <div className="relative max-w-4xl mx-auto px-4 py-16 text-center">
-          {category.icon && (
-            <img
-              src={category.icon}
-              alt=""
-              className="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
-            />
-          )}
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">{category.name}</h1>
-          {category.description && (
-            <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
-              {category.description}
-            </p>
-          )}
+          {category.icon ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={category.icon} alt="" className="w-16 h-16 mx-auto rounded-full object-cover" />
+          ) : null}
+          <h1 className="text-3xl md:text-5xl font-bold font-serif">{category.name}</h1>
+          {category.description ? (
+            <p className="text-gray-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">{category.description}</p>
+          ) : null}
         </div>
       </section>
 
-      {/* Content Tabs — only rendered when content exists (Phase 3/4 will populate) */}
-      {tabs.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 py-8">
-          <nav className="flex gap-1 border-b border-gray-200 mb-8 overflow-x-auto">
-            {tabs.map(tab => (
-              <a
-                key={tab.key}
-                href={`#${tab.key}`}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap border-b-2 border-transparent hover:border-gray-400 transition-colors"
-              >
-                {tab.label}
-                <span className="ml-1.5 text-xs text-gray-400">({tab.items.length})</span>
-              </a>
-            ))}
-          </nav>
-
-          {tabs.map(tab => (
-            <div key={tab.key} id={tab.key} className="mb-10">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">{tab.label}</h2>
-              <p className="text-gray-500 text-sm">{tab.items.length} item(s)</p>
-            </div>
-          ))}
-        </section>
-      )}
+      {/* Tabs */}
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        {groups.length ? (
+          <CategoryTabs groups={groups} />
+        ) : (
+          <p className="text-center text-gray-400 py-16 text-sm">No published content in this category yet.</p>
+        )}
+      </section>
     </main>
   )
 }

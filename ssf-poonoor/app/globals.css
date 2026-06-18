@@ -15,3 +15,77 @@
   --font-arabic: 'Inter', serif;
   --radius: 0.5rem;
 }
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-primary);
+}
+
+/* Hide scrollbars on horizontal "peek" scrollers (featured categories, chips). */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Base typographic styles for rich-text article bodies (TipTap HTML output).
+   Tailwind Typography isn't installed, so detail pages add `.article-content`
+   to get readable spacing for headings, lists, quotes and inline media. */
+.article-content {
+  color: var(--text-primary);
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+.article-content > * + * {
+  margin-top: 1rem;
+}
+.article-content h2 {
+  font-family: var(--font-heading), serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  margin-top: 1.75rem;
+}
+.article-content h3 {
+  font-family: var(--font-heading), serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-top: 1.5rem;
+}
+.article-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.article-content ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.article-content ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.article-content blockquote {
+  border-left: 4px solid var(--color-primary);
+  padding: 0.25rem 0 0.25rem 0.85rem;
+  font-style: italic;
+  color: var(--text-primary);
+  background: var(--bg-light);
+}
+.article-content img {
+  border-radius: var(--radius);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Respect reduced-motion preference (PLAN §19.4). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
