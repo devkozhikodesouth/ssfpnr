@@ -1,4 +1,6 @@
-require('dotenv').config({ path: '.env.local' })
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') })
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 
 // Demo content seed (PLAN Phase 9a). Populates the "Sahityotsav 26" category
 // with a representative set of published items so the portal can be demoed end

@@ -17,5 +17,6 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/app/((?!login).*)'],
+  // Protect everything under /app except the public auth pages (login, reset).
+  matcher: ['/app/((?!login|reset).*)'],
 }

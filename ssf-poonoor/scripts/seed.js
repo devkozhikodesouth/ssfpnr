@@ -1,4 +1,6 @@
-require('dotenv').config({ path: '.env.local' })
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') })
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 
 const connectDB = require('../lib/db')
 const Role = require('../models/Role')

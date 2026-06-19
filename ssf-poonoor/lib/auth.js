@@ -3,8 +3,12 @@ const { resolvePermissions } = require('./permissions')
 const { rateLimit, clientIp } = require('./rate-limit')
 
 function getModels() {
+  // Require Role too so its schema is registered before User.populate('roleId').
+  // Without this, a cold serverless auth invocation (which only loads the auth
+  // path) throws "Schema hasn't been registered for model 'Role'" and logins 401.
   return {
     User: require('../models/User'),
+    Role: require('../models/Role'),
   }
 }
 

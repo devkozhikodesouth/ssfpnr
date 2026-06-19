@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
@@ -79,6 +80,13 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
+
+        <Link
+          href="/app/reset"
+          className="block text-center text-sm text-gray-400 hover:text-emerald-400 mt-6 transition-colors"
+        >
+          Forgot / reset password
+        </Link>
       </div>
     </div>
   )
