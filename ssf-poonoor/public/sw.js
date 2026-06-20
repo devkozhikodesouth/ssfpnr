@@ -4,6 +4,7 @@
  *  - same-origin static assets (_next/static, icons): cache-first
  *  - never caches API calls or non-GET requests
  * Bump CACHE_VERSION to invalidate old caches on deploy. */
+
 const CACHE_VERSION = 'ssf-v1'
 const RUNTIME = `${CACHE_VERSION}-runtime`
 const PRECACHE = `${CACHE_VERSION}-precache`
