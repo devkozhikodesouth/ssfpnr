@@ -9,15 +9,15 @@
  *   the parent for gold). When `src` is provided (an uploaded logo from
  *   site-setup → branding) it renders that image instead of the built-in mark.
  */
-export default function Logo({ className = 'h-6 w-6 text-accent', src, alt = 'Logo' }) {
+export default function Logo({ className = 'h-6 w-6 text-accent', src, alt = 'Logo', style }) {
   if (src) {
     // Uploaded branding logo. object-contain keeps aspect ratio inside the box
     // the parent sizes via className (h-*/w-*).
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} className={`${className} object-contain`} />
+    return <img src={src} alt={alt} style={style} className={`${className} object-contain`} />
   }
   return (
-    <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg className={className} style={style} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="3.5" />
       <path
         d="M50 15 L80 35 L80 65 L50 85 L20 65 L20 35 Z"

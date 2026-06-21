@@ -1,4 +1,5 @@
 import HeroSection from '@/components/public/home/HeroSection'
+import LiveSection from '@/components/public/home/LiveSection'
 import AboutSection from '@/components/public/home/AboutSection'
 import FeaturedCategories from '@/components/public/home/FeaturedCategories'
 import ModuleSection from '@/components/public/home/ModuleSection'
@@ -56,6 +57,9 @@ export default async function HomePage() {
 
         if (section.type === 'hero') {
           return <HeroSection key={key} branding={branding} config={cfg} />
+        }
+        if (section.type === 'live') {
+          return <LiveSection key={key} config={cfg} />
         }
         if (section.type === 'newsletter') {
           return <Newsletter key={key} config={cfg} />

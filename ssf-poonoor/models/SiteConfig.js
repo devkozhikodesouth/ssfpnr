@@ -38,6 +38,20 @@ const bottomNavItemSchema = new mongoose.Schema(
   { _id: false }
 )
 
+// Reusable CTA button shape used by the website builder (header, footer, and the
+// homepage section blocks store CTAs in their Mixed `config`, but header/footer
+// CTAs are typed here so they persist reliably).
+const ctaSchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: false },
+    text: { type: String, default: '' },
+    url: { type: String, default: '' },
+    bgColor: { type: String, default: '#1a6b47' },
+    textColor: { type: String, default: '#ffffff' },
+  },
+  { _id: false }
+)
+
 const siteConfigSchema = new mongoose.Schema({
   branding: {
     siteName: { type: String, default: 'SSF Poonoor' },
@@ -64,6 +78,18 @@ const siteConfigSchema = new mongoose.Schema({
       scale: { type: Number, default: 1.25 },
     },
   },
+  // Website-builder header controls (colors, logo, CTA). Navigation *links* are
+  // still managed in path-manage / mobile.bottomNavItems; this is presentation.
+  header: {
+    bgColor: { type: String, default: '#141414' },
+    textColor: { type: String, default: '#e5e7eb' },
+    activeColor: { type: String, default: '#c9a84c' },
+    activeTextColor: { type: String, default: '#ffffff' },
+    logoType: { type: String, default: 'image', enum: ['image', 'text'] },
+    logoWidth: { type: Number, default: 160 },
+    logoUrl: { type: String, default: '' },
+    cta: { type: ctaSchema, default: () => ({ enabled: true, text: 'Donate', url: '', bgColor: '#1a6b47', textColor: '#ffffff' }) },
+  },
   layout: {
     headerStyle: { type: String, default: 'classic', enum: ['classic', 'minimal', 'centered'] },
     footerStyle: { type: String, default: 'classic', enum: ['classic', 'minimal', 'expanded'] },
@@ -84,14 +110,15 @@ const siteConfigSchema = new mongoose.Schema({
       type: [homepageSectionSchema],
       default: () => [
         { type: 'hero', enabled: true, order: 1 },
-        { type: 'about', enabled: true, order: 2 },
-        { type: 'campaigns', enabled: true, order: 3, config: { limit: 4 } },
-        { type: 'news', enabled: true, order: 4, config: { limit: 3 } },
-        { type: 'videos', enabled: true, order: 5, config: { limit: 3 } },
-        { type: 'gallery', enabled: true, order: 6, config: { limit: 8 } },
-        { type: 'blogs', enabled: true, order: 7, config: { limit: 3 } },
-        { type: 'events', enabled: true, order: 8, config: { limit: 4 } },
-        { type: 'newsletter', enabled: false, order: 9 },
+        { type: 'live', enabled: false, order: 2, config: { eyebrow: 'Streaming Now', title: 'Live' } },
+        { type: 'about', enabled: true, order: 3 },
+        { type: 'campaigns', enabled: true, order: 4, config: { limit: 4 } },
+        { type: 'news', enabled: true, order: 5, config: { limit: 3 } },
+        { type: 'videos', enabled: true, order: 6, config: { limit: 3 } },
+        { type: 'gallery', enabled: true, order: 7, config: { limit: 8 } },
+        { type: 'blogs', enabled: true, order: 8, config: { limit: 3 } },
+        { type: 'events', enabled: true, order: 9, config: { limit: 4 } },
+        { type: 'newsletter', enabled: false, order: 10 },
       ],
     },
   },
@@ -125,6 +152,8 @@ const siteConfigSchema = new mongoose.Schema({
     text: { type: String },
     textMl: { type: String },
     copyright: { type: String, default: '© SSF Poonoor Division. All rights reserved.' },
+    bgColor: { type: String, default: '#141414' },
+    cta: { type: ctaSchema, default: () => ({ enabled: false }) },
   },
   mobile: {
     bottomNavEnabled: { type: Boolean, default: true },

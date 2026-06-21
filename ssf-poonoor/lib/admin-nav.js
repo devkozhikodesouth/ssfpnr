@@ -32,6 +32,7 @@ const NAV_GROUPS = [
   {
     title: 'Appearance',
     items: [
+      { label: 'Website Builder', href: '/app/website-builder', icon: 'grid', perm: 'site.configure' },
       { label: 'Site Setup', href: '/app/site-setup', icon: 'settings', perm: 'site.configure' },
       { label: 'Fonts', href: '/app/fonts', icon: 'type', perm: 'fonts.upload' },
     ],

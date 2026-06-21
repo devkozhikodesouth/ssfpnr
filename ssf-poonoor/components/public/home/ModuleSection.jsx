@@ -52,20 +52,39 @@ export default async function ModuleSection({ type, config = {}, alt = false }) 
   if (!items.length) return null
 
   const { Card } = map
+  const sectionStyle = config.bgColor ? { backgroundColor: config.bgColor } : undefined
+  const cta = config.cta || {}
+  const ctaStyle = { backgroundColor: cta.bgColor || undefined, color: cta.textColor || undefined }
+  const ctaHref = cta.url || MODULE_PATH[map.module]
 
   return (
-    <section className={alt ? 'bg-lightbg' : 'bg-white'}>
+    <section className={alt ? 'bg-lightbg' : 'bg-white'} style={sectionStyle}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 space-y-5">
         <SectionHeader
           eyebrow={config.eyebrow || map.eyebrow}
           title={config.title || modConfig.label || map.title}
-          viewAllHref={MODULE_PATH[map.module]}
+          subtitle={config.subtitle}
+          viewAllHref={cta.enabled ? undefined : MODULE_PATH[map.module]}
         />
+        {config.description ? (
+          <p className="text-sm text-muted leading-relaxed max-w-3xl">{config.description}</p>
+        ) : null}
         <div className={LAYOUT_CLASS[map.layout]}>
           {items.map((item) => (
             <Card key={item._id} item={item} config={modConfig} />
           ))}
         </div>
+        {cta.enabled && cta.text ? (
+          <div>
+            <a
+              href={ctaHref}
+              style={ctaStyle}
+              className="inline-block bg-primary hover:bg-secondary text-white font-bold px-7 py-2.5 rounded-full text-xs tracking-wider uppercase shadow-md transition-colors"
+            >
+              {cta.text}
+            </a>
+          </div>
+        ) : null}
       </div>
     </section>
   )

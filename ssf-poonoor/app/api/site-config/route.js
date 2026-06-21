@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic'
 const CONFIG_KEYS = [
   'branding',
   'theme',
+  'header',
   'layout',
   'modules',
   'homepage',

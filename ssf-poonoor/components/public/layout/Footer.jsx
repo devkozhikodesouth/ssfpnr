@@ -16,9 +16,12 @@ export default function Footer({ branding = {}, social = {}, contact = {}, foote
   const footerLogo = branding.logoLight || branding.logo
   const socialLinks = SOCIAL_ORDER.map((k) => ({ key: k, href: social[k] })).filter((s) => s.href)
   const year = new Date().getFullYear()
+  const footerStyle = footer.bgColor ? { backgroundColor: footer.bgColor } : undefined
+  const cta = footer.cta || {}
+  const ctaStyle = { backgroundColor: cta.bgColor || undefined, color: cta.textColor || undefined }
 
   return (
-    <footer className="bg-darkbg text-gray-300 mt-auto">
+    <footer className="bg-darkbg text-gray-300 mt-auto" style={footerStyle}>
       <div className="max-w-7xl mx-auto px-6 py-10 grid gap-8 md:grid-cols-4">
         {/* Brand + tagline */}
         <div className="md:col-span-2 space-y-3">
@@ -41,6 +44,17 @@ export default function Footer({ branding = {}, social = {}, contact = {}, foote
             {footer.text ||
               'SSF Poonoor Division Committee. Education, ethical progression, and socio-cultural empowerment.'}
           </p>
+          {cta.enabled && cta.text ? (
+            <a
+              href={cta.url || '#'}
+              target={cta.url?.startsWith('http') ? '_blank' : undefined}
+              rel={cta.url?.startsWith('http') ? 'noopener noreferrer' : undefined}
+              style={ctaStyle}
+              className="inline-block bg-primary hover:bg-secondary text-white text-xs font-bold px-5 py-2 rounded-full shadow-md transition-colors"
+            >
+              {cta.text}
+            </a>
+          ) : null}
         </div>
 
         {/* Quick links */}

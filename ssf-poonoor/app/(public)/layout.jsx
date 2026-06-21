@@ -34,7 +34,8 @@ export default async function PublicLayout({ children }) {
       <Navbar
         navItems={navItems}
         siteName={branding.siteName || 'SSF Poonoor'}
-        logo={branding.logoLight || branding.logo}
+        logo={config?.header?.logoUrl || branding.logoLight || branding.logo}
+        header={config?.header || {}}
       />
       <main className="flex-grow pb-16 md:pb-0">{children}</main>
       <Footer
