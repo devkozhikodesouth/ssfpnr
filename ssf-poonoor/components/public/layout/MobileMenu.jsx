@@ -99,6 +99,7 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
                   key={item.path + item.label}
                   href={item.path}
                   target={item.isExternal ? '_blank' : undefined}
+                  rel={item.isExternal ? 'noopener noreferrer' : undefined}
                   className={`block px-5 py-3 text-sm font-semibold border-l-2 transition-colors ${
                     isActive(item.path)
                       ? 'border-accent text-accent bg-white/5'

@@ -53,6 +53,7 @@ export default function Footer({ branding = {}, social = {}, contact = {}, foote
                   <Link
                     href={item.path}
                     target={item.isExternal ? '_blank' : undefined}
+                    rel={item.isExternal ? 'noopener noreferrer' : undefined}
                     className="hover:text-accent transition-colors"
                   >
                     {item.label}
