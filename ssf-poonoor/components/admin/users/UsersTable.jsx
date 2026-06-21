@@ -9,11 +9,84 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+/** Read-only details modal opened by clicking a user row. */
+function UserDetailsModal({ user, onClose }) {
+  if (!user) return null
+  const rows = [
+    ['Name', user.name],
+    ['Username', user.username],
+    ['Email', user.email || '—'],
+    ['Phone', user.phone || '—'],
+    ['Role', user.roleId?.name || '—'],
+    ['Status', user.isActive ? 'Active' : 'Inactive'],
+    ['Last login', formatDate(user.lastLogin)],
+    ['Created', formatDate(user.createdAt)],
+  ]
+  const overrides = Array.isArray(user.permissions) ? user.permissions : []
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/60" />
+      <div
+        className="relative w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+          <h2 className="text-base font-semibold text-white">User details</h2>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="p-1 text-gray-400 hover:text-white text-xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+        <div className="px-5 py-4 space-y-2.5">
+          {rows.map(([label, value]) => (
+            <div key={label} className="flex justify-between gap-4 text-sm">
+              <span className="text-gray-500">{label}</span>
+              <span className="text-gray-100 text-right font-medium">{value}</span>
+            </div>
+          ))}
+          <div className="pt-2">
+            <span className="text-gray-500 text-sm">Permission overrides</span>
+            {overrides.length ? (
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {overrides.map((p) => (
+                  <span key={p} className="px-2 py-0.5 rounded bg-gray-800 text-gray-300 text-[11px] font-mono">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600 text-xs mt-1">None — inherits role permissions only.</p>
+            )}
+          </div>
+        </div>
+        <div className="px-5 py-3 border-t border-gray-800 flex justify-end">
+          <Link
+            href={`/app/users/${user._id}`}
+            className="px-4 py-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+          >
+            Edit user
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /** Admin users table with edit links and soft-delete. */
 export default function UsersTable({ users: initial }) {
   const router = useRouter()
   const [users, setUsers] = useState(initial)
   const [busy, setBusy] = useState(false)
+  const [selected, setSelected] = useState(null)
 
   async function handleDelete(id, name) {
     if (!confirm(`Delete user "${name}"? They will lose access immediately.`)) return
@@ -59,7 +132,11 @@ export default function UsersTable({ users: initial }) {
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u._id} className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+              <tr
+                key={u._id}
+                onClick={() => setSelected(u)}
+                className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer"
+              >
                 <td className="px-4 py-3">
                   <p className="text-white font-medium">{u.name}</p>
                   {u.email && <p className="text-gray-500 text-xs">{u.email}</p>}
@@ -89,12 +166,16 @@ export default function UsersTable({ users: initial }) {
                   <div className="flex items-center justify-end gap-2">
                     <Link
                       href={`/app/users/${u._id}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
                     >
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(u._id, u.name)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDelete(u._id, u.name)
+                      }}
                       disabled={busy}
                       className="px-3 py-1 text-xs bg-red-950 hover:bg-red-900 disabled:opacity-50 text-red-300 rounded transition-colors"
                     >
@@ -107,6 +188,7 @@ export default function UsersTable({ users: initial }) {
           </tbody>
         </table>
       </div>
+      <UserDetailsModal user={selected} onClose={() => setSelected(null)} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { inputClass, labelClass } from './field-styles'
+import Switch from './Switch'
 
 function toLocalInput(value) {
   if (!value) return ''
@@ -26,17 +27,14 @@ export default function VisibilityFields({ value = {}, onChange }) {
   return (
     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 space-y-4">
       <p className="text-sm font-medium text-gray-200">Visibility</p>
-      <div className="flex flex-wrap gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
         {toggles.map(({ field, label }) => (
-          <label key={field} className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={!!value[field]}
-              onChange={(e) => set({ [field]: e.target.checked })}
-              className="w-4 h-4 accent-emerald-600"
-            />
-            <span className="text-sm text-gray-300">{label}</span>
-          </label>
+          <Switch
+            key={field}
+            label={label}
+            checked={!!value[field]}
+            onChange={(v) => set({ [field]: v })}
+          />
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

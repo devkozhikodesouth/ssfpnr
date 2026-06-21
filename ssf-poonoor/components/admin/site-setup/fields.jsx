@@ -1,6 +1,7 @@
 'use client'
 
 import { inputClass, labelClass } from '@/components/admin/forms/field-styles'
+import Switch from '@/components/admin/forms/Switch'
 
 // Small controlled field primitives shared by every Site Setup tab so the tabs
 // stay declarative and we don't repeat input markup nine times.
@@ -95,29 +96,9 @@ export function SelectField({ label, value, onChange, options }) {
 
 export function ToggleField({ label, value, onChange, hint }) {
   return (
-    <label className="flex items-center justify-between gap-3 py-1.5 cursor-pointer">
-      <span className="text-sm text-gray-300">
-        {label}
-        {hint && <span className="block text-xs text-gray-500">{hint}</span>}
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={!!value}
-        onClick={() => onChange(!value)}
-        className={[
-          'relative h-6 w-11 flex-shrink-0 rounded-full transition-colors',
-          value ? 'bg-emerald-600' : 'bg-gray-700',
-        ].join(' ')}
-      >
-        <span
-          className={[
-            'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform',
-            value ? 'translate-x-5' : 'translate-x-0.5',
-          ].join(' ')}
-        />
-      </button>
-    </label>
+    <div className="py-1.5">
+      <Switch label={label} hint={hint} checked={!!value} onChange={onChange} />
+    </div>
   )
 }
 

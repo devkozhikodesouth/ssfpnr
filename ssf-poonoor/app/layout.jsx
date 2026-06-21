@@ -1,6 +1,7 @@
 import './globals.css'
 import ThemeInjector from '@/components/shared/ThemeInjector'
 import FontInjector from '@/components/shared/FontInjector'
+import GoogleFontInjector from '@/components/shared/GoogleFontInjector'
 import ServiceWorkerRegister from '@/components/public/ServiceWorkerRegister'
 
 export const metadata = {
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
         />
         <ThemeInjector />
         <FontInjector />
+        <GoogleFontInjector />
       </head>
       <body className="antialiased">
         {children}

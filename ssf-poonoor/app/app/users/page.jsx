@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import '@/models/Role'
 import User from '@/models/User'
 import UsersTable from '@/components/admin/users/UsersTable'
@@ -7,6 +8,7 @@ import UsersTable from '@/components/admin/users/UsersTable'
 export const dynamic = 'force-dynamic'
 
 export default async function UsersListPage() {
+  await requirePageAccess('users.manage')
   await connectDB()
   const raw = await User.find().populate('roleId', 'name slug color').sort({ createdAt: -1 }).lean()
   const users = JSON.parse(JSON.stringify(raw))

@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import Role from '@/models/Role'
 import RolesTable from '@/components/admin/roles/RolesTable'
 
 export const dynamic = 'force-dynamic'
 
 export default async function RolesListPage() {
+  await requirePageAccess('roles.manage')
   await connectDB()
   const raw = await Role.find().sort({ isSystem: -1, name: 1 }).lean()
   const roles = JSON.parse(JSON.stringify(raw))

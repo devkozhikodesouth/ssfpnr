@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { categorySchema, collectErrors } from '@/lib/validation'
+import Switch from './Switch'
 
 const MODULE_OPTIONS = ['news', 'video', 'gallery', 'blog', 'event', 'campaign', 'download']
 
@@ -233,32 +234,25 @@ export default function CategoryForm({ initialData = null }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-6 pt-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 pt-1">
         {[
           { field: 'isStandalone', label: 'Standalone (/c/[slug] page)' },
           { field: 'isFeatured', label: 'Featured (navbar / homepage)' },
         ].map(({ field, label: lbl }) => (
-          <label key={field} className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={form[field]}
-              onChange={e => setForm(prev => ({ ...prev, [field]: e.target.checked }))}
-              className="w-4 h-4 accent-emerald-600"
-            />
-            <span className="text-sm text-gray-300">{lbl}</span>
-          </label>
-        ))}
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={form.visibility.isPublished}
-            onChange={e =>
-              setForm(prev => ({ ...prev, visibility: { ...prev.visibility, isPublished: e.target.checked } }))
-            }
-            className="w-4 h-4 accent-emerald-600"
+          <Switch
+            key={field}
+            label={lbl}
+            checked={form[field]}
+            onChange={(v) => setForm(prev => ({ ...prev, [field]: v }))}
           />
-          <span className="text-sm text-gray-300">Published</span>
-        </label>
+        ))}
+        <Switch
+          label="Published"
+          checked={form.visibility.isPublished}
+          onChange={(v) =>
+            setForm(prev => ({ ...prev, visibility: { ...prev.visibility, isPublished: v } }))
+          }
+        />
       </div>
 
       {error && <p className="text-red-400 text-sm">{error}</p>}

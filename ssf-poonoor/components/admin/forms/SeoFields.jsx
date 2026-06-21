@@ -1,6 +1,7 @@
 'use client'
 
 import { inputClass, labelClass } from './field-styles'
+import Switch from './Switch'
 
 /**
  * Edits the embedded `seo` sub-document. value/onChange operate on the seo object.
@@ -76,15 +77,11 @@ export default function SeoFields({ value = {}, onChange }) {
             />
           </div>
         </div>
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={!!value.noIndex}
-            onChange={(e) => set({ noIndex: e.target.checked })}
-            className="w-4 h-4 accent-emerald-600"
-          />
-          <span className="text-sm text-gray-300">No index (hide from search engines)</span>
-        </label>
+        <Switch
+          label="No index (hide from search engines)"
+          checked={!!value.noIndex}
+          onChange={(v) => set({ noIndex: v })}
+        />
       </div>
     </details>
   )

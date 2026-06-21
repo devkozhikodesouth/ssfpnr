@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import Role from '@/models/Role'
 import User from '@/models/User'
 import UserForm from '@/components/admin/users/UserForm'
@@ -8,6 +9,7 @@ import UserForm from '@/components/admin/users/UserForm'
 export const dynamic = 'force-dynamic'
 
 export default async function EditUserPage({ params }) {
+  await requirePageAccess('users.manage')
   await connectDB()
   const [rawUser, rawRoles] = await Promise.all([
     User.findById(params.id).populate('roleId', 'name slug color').lean(),

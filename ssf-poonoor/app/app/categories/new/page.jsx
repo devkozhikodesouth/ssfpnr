@@ -1,7 +1,11 @@
 import Link from 'next/link'
+import { requirePageAccess } from '@/lib/admin-guard'
 import CategoryForm from '@/components/admin/forms/CategoryForm'
 
-export default function NewCategoryPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function NewCategoryPage() {
+  await requirePageAccess('categories.manage')
   return (
     <div className="min-h-screen bg-gray-950 p-6">
       <div className="max-w-2xl mx-auto">

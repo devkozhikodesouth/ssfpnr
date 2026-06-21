@@ -12,6 +12,7 @@ import LinkedItemsPicker from './LinkedItemsPicker'
 import SeoFields from './SeoFields'
 import VisibilityFields from './VisibilityFields'
 import RichTextEditor from '@/components/admin/editor/RichTextEditor'
+import Switch from './Switch'
 import CssEditor from '@/components/admin/editor/CssEditor'
 
 /** Inline raw-file (PDF/doc) uploader for the Download module's `file` field. */
@@ -434,15 +435,13 @@ export default function ContentForm({ module, initialData = null }) {
 
       case 'boolean':
         return (
-          <label key={field.name} className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+          <div key={field.name} className="max-w-sm">
+            <Switch
+              label={field.label}
               checked={!!value}
-              onChange={(e) => setField(field.name, e.target.checked)}
-              className="w-4 h-4 accent-emerald-600"
+              onChange={(v) => setField(field.name, v)}
             />
-            <span className="text-sm text-gray-300">{field.label}</span>
-          </label>
+          </div>
         )
 
       case 'file':

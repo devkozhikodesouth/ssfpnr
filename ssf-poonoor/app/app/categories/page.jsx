@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import Category from '@/models/Category'
 import CategoryTable from '@/components/admin/tables/CategoryTable'
 
 export const dynamic = 'force-dynamic'
 
 export default async function CategoriesPage() {
+  await requirePageAccess('categories.manage')
   await connectDB()
   const raw = await Category.find().sort({ order: 1, createdAt: -1 }).lean()
   const categories = JSON.parse(JSON.stringify(raw))

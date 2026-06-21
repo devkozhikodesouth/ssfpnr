@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import Role from '@/models/Role'
 import RoleForm from '@/components/admin/roles/RoleForm'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EditRolePage({ params }) {
+  await requirePageAccess('roles.manage')
   await connectDB()
   const raw = await Role.findById(params.id).lean()
   if (!raw) notFound()

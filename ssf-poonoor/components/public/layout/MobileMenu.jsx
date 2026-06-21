@@ -15,7 +15,7 @@ import Icon from '@/components/public/Icon'
  * Rendered only at < md (Navbar shows the desktop bar above that). Kept as one
  * client island so the server Navbar stays a server component.
  */
-export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor' }) {
+export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', logo }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [q, setQ] = useState('')
@@ -60,9 +60,13 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor' }) 
       </button>
 
       <Link href="/" className="flex items-center gap-1.5" aria-label={siteName}>
-        <span className="bg-primary/20 p-1 rounded-full border border-primary/30 shrink-0">
-          <Logo className="h-5 w-5 text-accent" />
-        </span>
+        {logo ? (
+          <Logo src={logo} alt={siteName} className="h-7 w-auto max-w-[120px]" />
+        ) : (
+          <span className="bg-primary/20 p-1 rounded-full border border-primary/30 shrink-0">
+            <Logo className="h-5 w-5 text-accent" />
+          </span>
+        )}
         <span className="text-white font-bold text-xs tracking-wider leading-none">{siteName}</span>
       </Link>
 

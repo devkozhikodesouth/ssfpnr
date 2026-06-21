@@ -1,6 +1,49 @@
 'use client'
 
 import { ColorField, NumberField, SelectField, TextField, FieldGroup } from './fields'
+import { labelClass, inputClass } from '@/components/admin/forms/field-styles'
+import { GOOGLE_FONTS, CATEGORY_LABELS } from '@/lib/google-fonts'
+
+const CAT_ORDER = ['sans', 'serif', 'display', 'handwriting', 'malayalam']
+
+/**
+ * Font-family picker. Lists any uploaded fonts first, then the Google catalog
+ * grouped by category, so an admin can switch typefaces without uploading.
+ * The chosen value is written to theme.<role>Font and loaded on the public site
+ * by FontInjector (uploads) / GoogleFontInjector (catalog).
+ */
+function FontSelect({ label, value, onChange, fonts }) {
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+      <select value={value ?? ''} onChange={(e) => onChange(e.target.value)} className={inputClass}>
+        <option value="">Default (Inter)</option>
+        {fonts.length ? (
+          <optgroup label="Uploaded fonts">
+            {fonts.map((f) => (
+              <option key={f._id} value={f.slug || f.name}>
+                {f.name}
+              </option>
+            ))}
+          </optgroup>
+        ) : null}
+        {CAT_ORDER.map((cat) => {
+          const items = GOOGLE_FONTS.filter((f) => f.cat === cat)
+          if (!items.length) return null
+          return (
+            <optgroup key={cat} label={CATEGORY_LABELS[cat]}>
+              {items.map((f) => (
+                <option key={f.name} value={f.name}>
+                  {f.name}
+                </option>
+              ))}
+            </optgroup>
+          )
+        })}
+      </select>
+    </div>
+  )
+}
 
 const HEADER_STYLES = [
   { value: 'classic', label: 'Classic' },
@@ -28,7 +71,7 @@ const RADIUS = [
  * size. Edits both the `theme` and `layout` branches of SiteConfig, so it takes
  * both slices and two setters.
  */
-export default function ThemeTab({ theme = {}, layout = {}, onChangeTheme, onChangeLayout }) {
+export default function ThemeTab({ theme = {}, layout = {}, fonts = [], onChangeTheme, onChangeLayout }) {
   const setTheme = (key, v) => onChangeTheme({ ...theme, [key]: v })
   const setFontSize = (key, v) => onChangeTheme({ ...theme, fontSize: { ...(theme.fontSize || {}), [key]: v } })
   const setLayout = (key, v) => onChangeLayout({ ...layout, [key]: v })
@@ -52,7 +95,17 @@ export default function ThemeTab({ theme = {}, layout = {}, onChangeTheme, onCha
         <SelectField label="Border radius" value={layout.radius} onChange={(v) => setLayout('radius', v)} options={RADIUS} />
       </FieldGroup>
 
-      <FieldGroup title="Typography scale" cols={2} description="Font families are managed in the Fonts tab.">
+      <FieldGroup
+        title="Font families"
+        cols={3}
+        description="Pick from the built-in Google catalog (no upload needed) or your uploaded fonts. Applies on save."
+      >
+        <FontSelect label="Heading font" value={theme.headingFont} onChange={(v) => setTheme('headingFont', v)} fonts={fonts} />
+        <FontSelect label="Body font" value={theme.bodyFont} onChange={(v) => setTheme('bodyFont', v)} fonts={fonts} />
+        <FontSelect label="Malayalam / Arabic font" value={theme.arabicFont} onChange={(v) => setTheme('arabicFont', v)} fonts={fonts} />
+      </FieldGroup>
+
+      <FieldGroup title="Typography scale" cols={2}>
         <TextField label="Base font size" value={theme.fontSize?.base} onChange={(v) => setFontSize('base', v)} placeholder="16px" />
         <NumberField label="Type scale ratio" value={theme.fontSize?.scale} onChange={(v) => setFontSize('scale', v)} step={0.05} min={1} max={2} />
       </FieldGroup>

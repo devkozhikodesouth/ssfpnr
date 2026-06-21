@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { inputClass, labelClass } from '@/components/admin/forms/field-styles'
 import PermissionGrid from '@/components/admin/PermissionGrid'
+import Switch from '@/components/admin/forms/Switch'
 
 /**
  * Create / edit form for an admin user. Roles (with their permission presets)
@@ -125,15 +126,13 @@ export default function UserForm({ roles = [], initialData = null }) {
         </div>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-300">
-        <input
-          type="checkbox"
+      <div className="max-w-xs">
+        <Switch
+          label="Active (can sign in)"
           checked={form.isActive}
-          onChange={(e) => set('isActive', e.target.checked)}
-          className="w-4 h-4 accent-emerald-600"
+          onChange={(v) => set('isActive', v)}
         />
-        Active (can sign in)
-      </label>
+      </div>
 
       <div>
         <label className={labelClass}>Permission overrides</label>

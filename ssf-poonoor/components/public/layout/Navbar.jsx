@@ -10,17 +10,21 @@ import NavLink from './NavLink'
  * in the (public) layout and passed down, so this stays a server component.
  *
  * @param {{ navItems: {label,path,labelMl?,isExternal?}[], siteName: string,
- *   donateHref?: string }} props
+ *   logo?: string, donateHref?: string }} props
  */
-export default function Navbar({ navItems = [], siteName = 'SSF Poonoor', donateHref }) {
+export default function Navbar({ navItems = [], siteName = 'SSF Poonoor', logo, donateHref }) {
   return (
     <header className="sticky top-0 z-40 bg-darkbg border-b border-white/10 select-none">
       {/* Desktop bar */}
       <div className="hidden md:flex max-w-7xl mx-auto px-6 lg:px-8 h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 shrink-0" aria-label={siteName}>
-          <span className="bg-primary/20 p-1.5 rounded-full border border-primary/30">
-            <Logo className="h-6 w-6 text-accent" />
-          </span>
+          {logo ? (
+            <Logo src={logo} alt={siteName} className="h-9 w-auto max-w-[160px]" />
+          ) : (
+            <span className="bg-primary/20 p-1.5 rounded-full border border-primary/30">
+              <Logo className="h-6 w-6 text-accent" />
+            </span>
+          )}
           <span className="text-white font-bold text-sm tracking-wider">{siteName}</span>
         </Link>
 
@@ -46,7 +50,7 @@ export default function Navbar({ navItems = [], siteName = 'SSF Poonoor', donate
 
       {/* Mobile bar */}
       <div className="md:hidden h-14 px-4 flex items-center justify-between">
-        <MobileMenu navItems={navItems} siteName={siteName} />
+        <MobileMenu navItems={navItems} siteName={siteName} logo={logo} />
       </div>
     </header>
   )

@@ -1,7 +1,11 @@
 import Link from 'next/link'
+import { requirePageAccess } from '@/lib/admin-guard'
 import RoleForm from '@/components/admin/roles/RoleForm'
 
-export default function NewRolePage() {
+export const dynamic = 'force-dynamic'
+
+export default async function NewRolePage() {
+  await requirePageAccess('roles.manage')
   return (
     <div className="min-h-screen bg-gray-950 p-6">
       <div className="max-w-4xl mx-auto">

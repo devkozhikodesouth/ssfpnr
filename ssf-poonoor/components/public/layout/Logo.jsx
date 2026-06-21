@@ -4,10 +4,18 @@
 // MobileMenu — single source so the mark is never duplicated.
 
 /**
- * @param {{ className?: string }} props className sizes/colours the svg (the
- *   crescent uses currentColor; set text-accent on the parent for gold).
+ * @param {{ className?: string, src?: string, alt?: string }} props className
+ *   sizes/colours the svg (the crescent uses currentColor; set text-accent on
+ *   the parent for gold). When `src` is provided (an uploaded logo from
+ *   site-setup → branding) it renders that image instead of the built-in mark.
  */
-export default function Logo({ className = 'h-6 w-6 text-accent' }) {
+export default function Logo({ className = 'h-6 w-6 text-accent', src, alt = 'Logo' }) {
+  if (src) {
+    // Uploaded branding logo. object-contain keeps aspect ratio inside the box
+    // the parent sizes via className (h-*/w-*).
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt} className={`${className} object-contain`} />
+  }
   return (
     <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="3.5" />

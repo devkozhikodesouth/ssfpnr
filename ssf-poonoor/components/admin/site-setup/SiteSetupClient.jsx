@@ -129,6 +129,7 @@ export default function SiteSetupClient({ initialConfig, fonts }) {
             <ThemeTab
               theme={config.theme}
               layout={config.layout}
+              fonts={fonts}
               onChangeTheme={(v) => setSection('theme', v)}
               onChangeLayout={(v) => setSection('layout', v)}
             />

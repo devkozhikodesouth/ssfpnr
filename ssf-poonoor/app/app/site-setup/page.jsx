@@ -1,4 +1,5 @@
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import SiteConfig from '@/models/SiteConfig'
 import Font from '@/models/Font'
 import SiteSetupClient from '@/components/admin/site-setup/SiteSetupClient'
@@ -6,6 +7,7 @@ import SiteSetupClient from '@/components/admin/site-setup/SiteSetupClient'
 export const dynamic = 'force-dynamic'
 
 export default async function SiteSetupPage() {
+  await requirePageAccess('site.configure')
   await connectDB()
 
   let config = await SiteConfig.findOne().lean()

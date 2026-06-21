@@ -1,10 +1,12 @@
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import NavPath from '@/models/NavPath'
 import PathManageClient from '@/components/admin/path-manage/PathManageClient'
 
 export const dynamic = 'force-dynamic'
 
 export default async function PathManagePage() {
+  await requirePageAccess('paths.manage')
   await connectDB()
   const raw = await NavPath.find().sort({ location: 1, order: 1 }).lean()
   const paths = JSON.parse(JSON.stringify(raw))

@@ -13,6 +13,7 @@ const SOCIAL_ORDER = ['facebook', 'instagram', 'youtube', 'twitter', 'telegram',
 
 export default function Footer({ branding = {}, social = {}, contact = {}, footer = {}, navItems = [] }) {
   const siteName = branding.siteName || 'SSF Poonoor'
+  const footerLogo = branding.logoLight || branding.logo
   const socialLinks = SOCIAL_ORDER.map((k) => ({ key: k, href: social[k] })).filter((s) => s.href)
   const year = new Date().getFullYear()
 
@@ -22,9 +23,13 @@ export default function Footer({ branding = {}, social = {}, contact = {}, foote
         {/* Brand + tagline */}
         <div className="md:col-span-2 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="bg-primary/20 p-2 rounded-full border border-primary/40">
-              <Logo className="h-7 w-7 text-accent" />
-            </span>
+            {footerLogo ? (
+              <Logo src={footerLogo} alt={siteName} className="h-10 w-auto max-w-[180px]" />
+            ) : (
+              <span className="bg-primary/20 p-2 rounded-full border border-primary/40">
+                <Logo className="h-7 w-7 text-accent" />
+              </span>
+            )}
             <div>
               <h4 className="text-sm font-bold text-white tracking-widest">{siteName}</h4>
               {branding.tagline ? (

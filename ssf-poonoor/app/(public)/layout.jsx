@@ -31,7 +31,11 @@ export default async function PublicLayout({ children }) {
     <div className="min-h-screen flex flex-col bg-lightbg">
       <JsonLd data={organizationLd} />
       <GoogleAnalytics gaId={config?.seo?.googleAnalyticsId} />
-      <Navbar navItems={navItems} siteName={branding.siteName || 'SSF Poonoor'} />
+      <Navbar
+        navItems={navItems}
+        siteName={branding.siteName || 'SSF Poonoor'}
+        logo={branding.logoLight || branding.logo}
+      />
       <main className="flex-grow pb-16 md:pb-0">{children}</main>
       <Footer
         branding={branding}

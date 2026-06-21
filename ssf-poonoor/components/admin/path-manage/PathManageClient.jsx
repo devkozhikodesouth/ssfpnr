@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import SortableList from '@/components/admin/SortableList'
 import { inputClass, labelClass } from '@/components/admin/forms/field-styles'
+import Switch from '@/components/admin/forms/Switch'
 
 const LOCATIONS = [
   { key: 'top-nav', label: 'Top Navigation' },
@@ -172,15 +173,9 @@ export default function PathManageClient({ paths: initial }) {
               ))}
             </select>
           </div>
-          <div className="flex items-end gap-6 pb-1">
-            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-              <input type="checkbox" checked={form.isExternal} onChange={(e) => setField('isExternal', e.target.checked)} className="accent-emerald-600" />
-              External link
-            </label>
-            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-              <input type="checkbox" checked={form.isVisible} onChange={(e) => setField('isVisible', e.target.checked)} className="accent-emerald-600" />
-              Visible
-            </label>
+          <div className="flex flex-col justify-end gap-3 pb-1">
+            <Switch label="External link" checked={form.isExternal} onChange={(v) => setField('isExternal', v)} />
+            <Switch label="Visible" checked={form.isVisible} onChange={(v) => setField('isVisible', v)} />
           </div>
         </div>
 

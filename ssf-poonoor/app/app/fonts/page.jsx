@@ -1,10 +1,12 @@
 import connectDB from '@/lib/db'
+import { requirePageAccess } from '@/lib/admin-guard'
 import Font from '@/models/Font'
 import FontsManager from '@/components/admin/fonts/FontsManager'
 
 export const dynamic = 'force-dynamic'
 
 export default async function FontsPage() {
+  await requirePageAccess('fonts.upload')
   await connectDB()
   const raw = await Font.find().sort({ createdAt: -1 }).select('-cloudinaryIds').lean()
   const fonts = JSON.parse(JSON.stringify(raw))
