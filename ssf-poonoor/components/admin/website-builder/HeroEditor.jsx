@@ -3,6 +3,7 @@
 import { TextField, TextareaField, ColorField, SelectField, FieldGroup } from '@/components/admin/site-setup/fields'
 import ImageUploader from '@/components/admin/forms/ImageUploader'
 import CtaEditor from './CtaEditor'
+import TypographyField from './TypographyField'
 
 /**
  * Hero block editor (Website Builder → Hero). Edits the homepage hero section's
@@ -14,6 +15,8 @@ import CtaEditor from './CtaEditor'
 export default function HeroEditor({ value = {}, onChange }) {
   const set = (patch) => onChange({ ...value, ...patch })
   const mediaKind = value.video ? 'video' : 'image'
+  const ty = value.typography || {}
+  const setType = (key, t) => set({ typography: { ...ty, [key]: t } })
 
   return (
     <div className="space-y-4">
@@ -25,6 +28,10 @@ export default function HeroEditor({ value = {}, onChange }) {
         <div className="md:col-span-2">
           <TextareaField label="Description" value={value.description} onChange={(v) => set({ description: v })} placeholder="A short introduction…" />
         </div>
+        <TypographyField label="Title typography" value={ty.title} onChange={(t) => setType('title', t)} />
+        <TypographyField label="Eyebrow typography" value={ty.eyebrow} onChange={(t) => setType('eyebrow', t)} />
+        <TypographyField label="Subtitle typography" value={ty.subtitle} onChange={(t) => setType('subtitle', t)} />
+        <TypographyField label="Description typography" value={ty.description} onChange={(t) => setType('description', t)} />
       </FieldGroup>
 
       <FieldGroup title="Background Media" description="Use a background image, or a video URL (MP4 / YouTube) for a moving backdrop.">

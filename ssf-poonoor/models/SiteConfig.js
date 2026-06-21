@@ -155,6 +155,59 @@ const siteConfigSchema = new mongoose.Schema({
     bgColor: { type: String, default: '#141414' },
     cta: { type: ctaSchema, default: () => ({ enabled: false }) },
   },
+  // Fully editable About page (Website Builder → About Page). Every section's
+  // copy, colours and lists are data-driven; the public /about page falls back to
+  // sensible defaults when a field is blank.
+  about: {
+    hero: {
+      eyebrow: { type: String, default: 'About Us' },
+      title: { type: String },
+      subtitle: { type: String },
+      description: { type: String },
+      bgColor: { type: String, default: '#141414' },
+      cta: { type: ctaSchema, default: () => ({ enabled: false }) },
+    },
+    missionVision: {
+      bgColor: { type: String, default: '#ffffff' },
+      mission: {
+        eyebrow: { type: String, default: 'Our Mission' },
+        title: { type: String, default: 'Empowering Students' },
+        text: { type: String },
+      },
+      vision: {
+        eyebrow: { type: String, default: 'Our Vision' },
+        title: { type: String, default: 'A Knowledge Community' },
+        text: { type: String },
+      },
+    },
+    pillars: {
+      eyebrow: { type: String, default: 'What We Do' },
+      title: { type: String, default: 'Our Pillars' },
+      bgColor: { type: String, default: '#f8fafc' },
+      items: {
+        type: [new mongoose.Schema({ title: String, icon: String }, { _id: false })],
+        default: undefined,
+      },
+    },
+    leadership: {
+      eyebrow: { type: String, default: 'Our Team' },
+      title: { type: String, default: 'Leadership' },
+      bgColor: { type: String, default: '#ffffff' },
+      items: {
+        type: [new mongoose.Schema({ name: String, role: String, photo: String }, { _id: false })],
+        default: undefined,
+      },
+    },
+    wings: {
+      eyebrow: { type: String, default: 'Portfolios' },
+      title: { type: String, default: 'Wings & Initiatives' },
+      bgColor: { type: String, default: '#f8fafc' },
+      items: {
+        type: [new mongoose.Schema({ name: String, desc: String }, { _id: false })],
+        default: undefined,
+      },
+    },
+  },
   mobile: {
     bottomNavEnabled: { type: Boolean, default: true },
     bottomNavItems: {

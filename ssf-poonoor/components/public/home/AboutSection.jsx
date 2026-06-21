@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Icon from '@/components/public/Icon'
 import SectionHeader from '@/components/public/SectionHeader'
+import { typeStyle } from '@/lib/typography'
 
 // The five SSF pillars (PLAN §15.1 #2). Defaults shown when no config override.
 const DEFAULT_PILLARS = [
@@ -23,6 +24,7 @@ export default function AboutSection({ config = {}, alt = false }) {
   const sectionStyle = config.bgColor ? { backgroundColor: config.bgColor } : undefined
   const cta = config.cta || {}
   const ctaStyle = { backgroundColor: cta.bgColor || undefined, color: cta.textColor || undefined }
+  const ty = config.typography || {}
 
   return (
     <section className={alt ? 'bg-lightbg' : 'bg-white'} style={sectionStyle}>
@@ -31,8 +33,9 @@ export default function AboutSection({ config = {}, alt = false }) {
           eyebrow={config.eyebrow || 'Who We Are'}
           title={config.title || 'Our Pillars'}
           subtitle={config.subtitle}
+          titleStyle={typeStyle(ty.title)}
         />
-        <p className="text-sm text-muted leading-relaxed max-w-3xl">
+        <p className="text-sm text-muted leading-relaxed max-w-3xl" style={typeStyle(ty.body)}>
           {config.description ||
             config.intro ||
             'SSF Poonoor Division works across cultural, spiritual, educational, environmental and political fronts to empower the student community.'}

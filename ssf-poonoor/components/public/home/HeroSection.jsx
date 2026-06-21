@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { typeStyle } from '@/lib/typography'
 
 /**
  * Full-bleed dark hero (PLAN §15.1 #1). Background image OR video with gradient
@@ -26,6 +27,7 @@ export default function HeroSection({ branding = {}, config = {} }) {
 
   const sectionStyle = config.bgColor ? { backgroundColor: config.bgColor } : undefined
   const ctaStyle = ctaBg || ctaText ? { backgroundColor: ctaBg, color: ctaText } : undefined
+  const ty = config.typography || {}
 
   return (
     <section className="relative bg-darkbg text-white overflow-hidden" style={sectionStyle}>
@@ -45,12 +47,20 @@ export default function HeroSection({ branding = {}, config = {} }) {
       <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-32">
         <div className="max-w-2xl space-y-4">
           {eyebrow ? (
-            <p className="text-xs md:text-sm text-accent tracking-[0.2em] uppercase font-semibold">{eyebrow}</p>
+            <p className="text-xs md:text-sm text-accent tracking-[0.2em] uppercase font-semibold" style={typeStyle(ty.eyebrow)}>
+              {eyebrow}
+            </p>
           ) : null}
-          <h1 className="text-4xl md:text-6xl font-bold font-serif tracking-wide leading-tight">{title}</h1>
-          <p className="text-xs md:text-sm text-gray-300 tracking-wider uppercase font-medium">{subtitle}</p>
+          <h1 className="text-4xl md:text-6xl font-bold font-serif tracking-wide leading-tight" style={typeStyle(ty.title)}>
+            {title}
+          </h1>
+          <p className="text-xs md:text-sm text-gray-300 tracking-wider uppercase font-medium" style={typeStyle(ty.subtitle)}>
+            {subtitle}
+          </p>
           {description ? (
-            <p className="text-sm md:text-base text-gray-200 leading-relaxed max-w-xl">{description}</p>
+            <p className="text-sm md:text-base text-gray-200 leading-relaxed max-w-xl" style={typeStyle(ty.description)}>
+              {description}
+            </p>
           ) : null}
           {ctaEnabled && ctaLabel ? (
             <div className="pt-2">

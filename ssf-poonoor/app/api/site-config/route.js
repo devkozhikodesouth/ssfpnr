@@ -23,6 +23,7 @@ const CONFIG_KEYS = [
   'social',
   'contact',
   'footer',
+  'about',
   'mobile',
   'performance',
 ]

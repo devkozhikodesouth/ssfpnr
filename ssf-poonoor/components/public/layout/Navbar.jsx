@@ -43,9 +43,16 @@ export default function Navbar({ navItems = [], siteName = 'SSF Poonoor', logo, 
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6 text-xs font-semibold text-gray-300" style={textStyle}>
+        <nav className="flex items-center gap-6 text-xs font-semibold text-gray-300">
           {navItems.map((item) => (
-            <NavLink key={item.path + item.label} href={item.path} external={item.isExternal}>
+            <NavLink
+              key={item.path + item.label}
+              href={item.path}
+              external={item.isExternal}
+              textColor={header.textColor}
+              activeColor={header.activeColor}
+              activeTextColor={header.activeTextColor}
+            >
               {item.label}
             </NavLink>
           ))}

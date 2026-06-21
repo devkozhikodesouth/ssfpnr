@@ -6,6 +6,7 @@ import GalleryCard from '@/components/public/cards/GalleryCard'
 import EventCard from '@/components/public/cards/EventCard'
 import CampaignCard from '@/components/public/cards/CampaignCard'
 import { fetchPublicList, getModuleConfig, MODULE_PATH } from '@/lib/public-content'
+import { typeStyle } from '@/lib/typography'
 
 /**
  * GENERIC homepage content section (PLAN anti-duplication rule). One component
@@ -56,6 +57,7 @@ export default async function ModuleSection({ type, config = {}, alt = false }) 
   const cta = config.cta || {}
   const ctaStyle = { backgroundColor: cta.bgColor || undefined, color: cta.textColor || undefined }
   const ctaHref = cta.url || MODULE_PATH[map.module]
+  const ty = config.typography || {}
 
   return (
     <section className={alt ? 'bg-lightbg' : 'bg-white'} style={sectionStyle}>
@@ -64,10 +66,11 @@ export default async function ModuleSection({ type, config = {}, alt = false }) 
           eyebrow={config.eyebrow || map.eyebrow}
           title={config.title || modConfig.label || map.title}
           subtitle={config.subtitle}
+          titleStyle={typeStyle(ty.title)}
           viewAllHref={cta.enabled ? undefined : MODULE_PATH[map.module]}
         />
         {config.description ? (
-          <p className="text-sm text-muted leading-relaxed max-w-3xl">{config.description}</p>
+          <p className="text-sm text-muted leading-relaxed max-w-3xl" style={typeStyle(ty.body)}>{config.description}</p>
         ) : null}
         <div className={LAYOUT_CLASS[map.layout]}>
           {items.map((item) => (

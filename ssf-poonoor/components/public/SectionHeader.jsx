@@ -8,14 +8,15 @@ import Link from 'next/link'
  * @param {{ eyebrow?: string, title: string, subtitle?: string, viewAllHref?: string,
  *   viewAllLabel?: string, size?: 'sm'|'lg' }} props
  */
-export default function SectionHeader({ eyebrow, title, subtitle, viewAllHref, viewAllLabel = 'View all', size = 'sm' }) {
+export default function SectionHeader({ eyebrow, title, subtitle, viewAllHref, viewAllLabel = 'View all', size = 'sm', titleStyle, eyebrowStyle }) {
   return (
     <div className="flex justify-between items-end gap-4">
       <div>
         {eyebrow ? (
-          <span className="block text-[10px] font-bold text-accent uppercase tracking-widest">{eyebrow}</span>
+          <span className="block text-[10px] font-bold text-accent uppercase tracking-widest" style={eyebrowStyle}>{eyebrow}</span>
         ) : null}
         <h2
+          style={titleStyle}
           className={`font-bold font-serif text-ink mt-0.5 leading-tight ${
             size === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
           }`}

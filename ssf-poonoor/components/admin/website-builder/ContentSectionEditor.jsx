@@ -2,6 +2,7 @@
 
 import { TextField, TextareaField, ColorField, FieldGroup } from '@/components/admin/site-setup/fields'
 import CtaEditor from './CtaEditor'
+import TypographyField from './TypographyField'
 
 /**
  * Shared content-block editor for the homepage sections that follow the standard
@@ -14,6 +15,8 @@ import CtaEditor from './CtaEditor'
  */
 export default function ContentSectionEditor({ value = {}, onChange, title = 'Section Content', description, children }) {
   const set = (patch) => onChange({ ...value, ...patch })
+  const ty = value.typography || {}
+  const setType = (key, t) => set({ typography: { ...ty, [key]: t } })
 
   return (
     <div className="space-y-4">
@@ -25,6 +28,8 @@ export default function ContentSectionEditor({ value = {}, onChange, title = 'Se
         <div className="md:col-span-2">
           <TextareaField label="Description" value={value.description} onChange={(v) => set({ description: v })} placeholder="Supporting copy for this section…" />
         </div>
+        <TypographyField label="Title typography" value={ty.title} onChange={(t) => setType('title', t)} />
+        <TypographyField label="Body typography" value={ty.body} onChange={(t) => setType('body', t)} />
       </FieldGroup>
 
       {children}
