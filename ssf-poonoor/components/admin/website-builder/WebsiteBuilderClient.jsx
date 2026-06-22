@@ -9,6 +9,7 @@ import GallerySectionEditor from './GallerySectionEditor'
 import AboutEditor from './AboutEditor'
 import AboutPageEditor from './AboutPageEditor'
 import FooterEditor from './FooterEditor'
+import LayoutEditor from './LayoutEditor'
 
 // Builder sections in editing order. `kind` decides where the data lives:
 //  - 'branch'  → a top-level SiteConfig branch (header / footer / about)
@@ -22,6 +23,7 @@ const SECTIONS = [
   { key: 'about', label: 'About (home)', kind: 'section', type: 'about', Editor: AboutEditor, preview: 'home' },
   { key: 'aboutPage', label: 'About Page', kind: 'branch', branch: 'about', Editor: AboutPageEditor, preview: 'about' },
   { key: 'footer', label: 'Footer', kind: 'branch', branch: 'footer', Editor: FooterEditor, preview: 'home' },
+  { key: 'layout', label: 'Layout', kind: 'branch', branch: 'chrome', Editor: LayoutEditor, preview: 'home' },
 ]
 
 const DEVICES = [
@@ -104,6 +106,7 @@ export default function WebsiteBuilderClient({ initialConfig }) {
           header: config.header,
           footer: config.footer,
           about: config.about,
+          chrome: config.chrome,
           homepage: config.homepage,
         }),
       })

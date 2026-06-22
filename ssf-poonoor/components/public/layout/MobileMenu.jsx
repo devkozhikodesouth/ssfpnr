@@ -15,7 +15,7 @@ import Icon from '@/components/public/Icon'
  * Rendered only at < md (Navbar shows the desktop bar above that). Kept as one
  * client island so the server Navbar stays a server component.
  */
-export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', logo }) {
+export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', logo, header = {} }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [q, setQ] = useState('')
@@ -47,6 +47,10 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
 
   const isActive = (path) => pathname === path || (path !== '/' && pathname.startsWith(path))
 
+  // Header colours from Website Builder → Header (fall back to the dark theme).
+  const textStyle = header.textColor ? { color: header.textColor } : undefined
+  const panelStyle = header.bgColor ? { backgroundColor: header.bgColor } : undefined
+
   return (
     <>
       {/* Mobile bar inner row */}
@@ -54,6 +58,7 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label="Open menu"
+        style={textStyle}
         className="text-white hover:text-accent p-1 transition-colors"
       >
         <Icon name="menu" className="w-6 h-6" />
@@ -67,13 +72,14 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
             <Logo className="h-5 w-5 text-accent" />
           </span>
         )}
-        <span className="text-white font-bold text-xs tracking-wider leading-none">{siteName}</span>
+        <span className="text-white font-bold text-xs tracking-wider leading-none" style={textStyle}>{siteName}</span>
       </Link>
 
       <button
         type="button"
         onClick={() => setSearchOpen(true)}
         aria-label="Search"
+        style={textStyle}
         className="text-white hover:text-accent p-1 transition-colors"
       >
         <Icon name="search" className="w-5 h-5" />
@@ -83,11 +89,11 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
       {menuOpen && (
         <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMenuOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[80%] bg-darkbg text-white shadow-2xl flex flex-col">
+          <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[80%] bg-darkbg text-white shadow-2xl flex flex-col" style={panelStyle}>
             <div className="h-14 px-4 flex items-center justify-between border-b border-white/10">
               <span className="flex items-center gap-2">
                 <Logo className="h-6 w-6 text-accent" />
-                <span className="font-bold text-sm tracking-wider">{siteName}</span>
+                <span className="font-bold text-sm tracking-wider" style={textStyle}>{siteName}</span>
               </span>
               <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className="p-1 text-white hover:text-accent">
                 <Icon name="close" className="w-6 h-6" />
@@ -117,7 +123,7 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
 
       {/* Full-screen search overlay */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[60] bg-darkbg/95 flex flex-col p-4" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[60] bg-darkbg/95 flex flex-col p-4" role="dialog" aria-modal="true" style={panelStyle}>
           <div className="flex items-center justify-end">
             <button onClick={() => setSearchOpen(false)} aria-label="Close search" className="p-2 text-white hover:text-accent">
               <Icon name="close" className="w-7 h-7" />

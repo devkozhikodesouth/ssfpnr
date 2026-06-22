@@ -52,6 +52,18 @@ const ctaSchema = new mongoose.Schema(
   { _id: false }
 )
 
+// Per-page chrome visibility (Website Builder → Layout). Lets specific screens
+// drop the header and/or footer so their content can sit edge-to-edge.
+const chromePageSchema = new mongoose.Schema(
+  {
+    label: { type: String },
+    path: { type: String },
+    hideHeader: { type: Boolean, default: false },
+    hideFooter: { type: Boolean, default: false },
+  },
+  { _id: false }
+)
+
 const siteConfigSchema = new mongoose.Schema({
   branding: {
     siteName: { type: String, default: 'SSF Poonoor' },
@@ -89,6 +101,24 @@ const siteConfigSchema = new mongoose.Schema({
     logoWidth: { type: Number, default: 160 },
     logoUrl: { type: String, default: '' },
     cta: { type: ctaSchema, default: () => ({ enabled: true, text: 'Donate', url: '', bgColor: '#1a6b47', textColor: '#ffffff' }) },
+  },
+  // Per-page header/footer visibility. `pages` is matched against the current
+  // pathname (exact for '/', prefix for the rest); the most specific match wins.
+  chrome: {
+    pages: {
+      type: [chromePageSchema],
+      default: () => [
+        { label: 'Home', path: '/', hideHeader: false, hideFooter: false },
+        { label: 'About', path: '/about', hideHeader: false, hideFooter: false },
+        { label: 'News', path: '/news', hideHeader: false, hideFooter: false },
+        { label: 'Gallery', path: '/gallery', hideHeader: false, hideFooter: false },
+        { label: 'Videos', path: '/video', hideHeader: false, hideFooter: false },
+        { label: 'Events', path: '/events', hideHeader: false, hideFooter: false },
+        { label: 'Blogs', path: '/blogs', hideHeader: false, hideFooter: false },
+        { label: 'Campaigns', path: '/campaigns', hideHeader: false, hideFooter: false },
+        { label: 'Downloads', path: '/downloads', hideHeader: false, hideFooter: false },
+      ],
+    },
   },
   layout: {
     headerStyle: { type: String, default: 'classic', enum: ['classic', 'minimal', 'centered'] },
@@ -166,6 +196,7 @@ const siteConfigSchema = new mongoose.Schema({
       description: { type: String },
       bgColor: { type: String, default: '#141414' },
       cta: { type: ctaSchema, default: () => ({ enabled: false }) },
+      typography: { type: mongoose.Schema.Types.Mixed },
     },
     missionVision: {
       bgColor: { type: String, default: '#ffffff' },

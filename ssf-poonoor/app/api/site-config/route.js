@@ -16,6 +16,7 @@ const CONFIG_KEYS = [
   'branding',
   'theme',
   'header',
+  'chrome',
   'layout',
   'modules',
   'homepage',

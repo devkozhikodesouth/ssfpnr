@@ -1,6 +1,7 @@
 import Navbar from '@/components/public/layout/Navbar'
 import Footer from '@/components/public/layout/Footer'
 import BottomNav from '@/components/public/layout/BottomNav'
+import PublicChrome from '@/components/public/layout/PublicChrome'
 import JsonLd from '@/components/public/seo/JsonLd'
 import GoogleAnalytics from '@/components/public/seo/GoogleAnalytics'
 import { getSiteConfig, getPrimaryNav, getBottomNav, getNavPaths } from '@/lib/public-content'
@@ -28,24 +29,30 @@ export default async function PublicLayout({ children }) {
   const organizationLd = buildJsonLd({ type: 'Organization', siteConfig: config })
 
   return (
-    <div className="min-h-screen flex flex-col bg-lightbg">
+    <PublicChrome
+      pages={config?.chrome?.pages || []}
+      header={
+        <Navbar
+          navItems={navItems}
+          siteName={branding.siteName || 'SSF Poonoor'}
+          logo={config?.header?.logoUrl || branding.logoLight || branding.logo}
+          header={config?.header || {}}
+        />
+      }
+      footer={
+        <Footer
+          branding={branding}
+          social={config?.social || {}}
+          contact={config?.contact || {}}
+          footer={config?.footer || {}}
+          navItems={footerNav.length ? footerNav : navItems}
+        />
+      }
+      bottomNav={<BottomNav items={bottomNav || []} />}
+    >
       <JsonLd data={organizationLd} />
       <GoogleAnalytics gaId={config?.seo?.googleAnalyticsId} />
-      <Navbar
-        navItems={navItems}
-        siteName={branding.siteName || 'SSF Poonoor'}
-        logo={config?.header?.logoUrl || branding.logoLight || branding.logo}
-        header={config?.header || {}}
-      />
-      <main className="flex-grow pb-16 md:pb-0">{children}</main>
-      <Footer
-        branding={branding}
-        social={config?.social || {}}
-        contact={config?.contact || {}}
-        footer={config?.footer || {}}
-        navItems={footerNav.length ? footerNav : navItems}
-      />
-      <BottomNav items={bottomNav || []} />
-    </div>
+      {children}
+    </PublicChrome>
   )
 }

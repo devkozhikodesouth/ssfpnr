@@ -3,6 +3,7 @@
 import { TextField, TextareaField, ColorField, SelectField, FieldGroup } from '@/components/admin/site-setup/fields'
 import ImageUploader from '@/components/admin/forms/ImageUploader'
 import CtaEditor from './CtaEditor'
+import TypographyField from './TypographyField'
 
 const ICON_OPTIONS = [
   'image', 'megaphone', 'document', 'map-pin', 'newspaper', 'calendar',
@@ -76,6 +77,16 @@ export default function AboutPageEditor({ value = {}, onChange }) {
         <div className="md:col-span-2">
           <TextareaField label="Description" value={hero.description} onChange={(v) => set('hero', { description: v })} rows={4} />
         </div>
+        <TypographyField
+          label="Title typography"
+          value={hero.typography?.title}
+          onChange={(t) => set('hero', { typography: { ...(hero.typography || {}), title: t } })}
+        />
+        <TypographyField
+          label="Description typography"
+          value={hero.typography?.description}
+          onChange={(t) => set('hero', { typography: { ...(hero.typography || {}), description: t } })}
+        />
       </FieldGroup>
       <CtaEditor title="About Hero CTA" value={hero.cta} onChange={(cta) => set('hero', { cta })} />
 

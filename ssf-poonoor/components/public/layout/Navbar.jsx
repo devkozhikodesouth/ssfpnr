@@ -75,7 +75,7 @@ export default function Navbar({ navItems = [], siteName = 'SSF Poonoor', logo, 
 
       {/* Mobile bar */}
       <div className="md:hidden h-14 px-4 flex items-center justify-between">
-        <MobileMenu navItems={navItems} siteName={siteName} logo={showLogoImage ? logo : undefined} />
+        <MobileMenu navItems={navItems} siteName={siteName} logo={showLogoImage ? logo : undefined} header={header} />
       </div>
     </header>
   )

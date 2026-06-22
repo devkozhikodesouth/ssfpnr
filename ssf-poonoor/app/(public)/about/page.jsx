@@ -5,6 +5,7 @@ import Icon from '@/components/public/Icon'
 import JsonLd from '@/components/public/seo/JsonLd'
 import { getSiteConfig } from '@/lib/public-content'
 import { buildMetadata, buildJsonLd } from '@/lib/seo'
+import { typeStyle } from '@/lib/typography'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,9 +92,9 @@ export default async function AboutPage() {
           {hero.eyebrow ? (
             <span className="block text-[10px] font-bold text-accent uppercase tracking-widest">{hero.eyebrow}</span>
           ) : null}
-          <h1 className="text-3xl md:text-5xl font-bold font-serif">{hero.title || siteName}</h1>
+          <h1 className="text-3xl md:text-5xl font-bold font-serif" style={typeStyle(hero.typography?.title)}>{hero.title || siteName}</h1>
           {hero.subtitle ? <p className="text-sm text-accent tracking-wider uppercase">{hero.subtitle}</p> : null}
-          <p className="text-sm text-gray-300 max-w-2xl leading-relaxed">
+          <p className="text-sm text-gray-300 max-w-2xl leading-relaxed" style={typeStyle(hero.typography?.description)}>
             {hero.description ||
               'Sunni Student Federation (SSF) has, since 1973, nurtured students through education, spirituality and socio-cultural engagement. The Poonoor Division carries that legacy forward across its campuses and communities.'}
           </p>
