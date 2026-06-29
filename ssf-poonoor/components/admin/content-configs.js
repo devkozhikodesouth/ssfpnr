@@ -27,6 +27,7 @@ export const CONTENT_MODULES = {
     singular: 'News Item',
     apiBase: '/api/news',
     basePath: '/app/news',
+    publicBase: '/news',
     appliesTo: 'news',
     fields: [
       { name: 'title', type: 'text', label: 'Title', required: true },
@@ -49,6 +50,7 @@ export const CONTENT_MODULES = {
     singular: 'Blog Post',
     apiBase: '/api/blogs',
     basePath: '/app/blogs',
+    publicBase: '/blogs',
     appliesTo: 'blog',
     fields: [
       { name: 'title', type: 'text', label: 'Title', required: true },
@@ -71,6 +73,7 @@ export const CONTENT_MODULES = {
     singular: 'Video',
     apiBase: '/api/video',
     basePath: '/app/video',
+    publicBase: '/video',
     appliesTo: 'video',
     fields: [
       { name: 'title', type: 'text', label: 'Title', required: true },
@@ -113,6 +116,7 @@ export const CONTENT_MODULES = {
     singular: 'Campaign',
     apiBase: '/api/campaigns',
     basePath: '/app/campaigns',
+    publicBase: '/campaigns',
     appliesTo: 'campaign',
     fields: [
       { name: 'title', type: 'text', label: 'Title', required: true },
@@ -135,6 +139,7 @@ export const CONTENT_MODULES = {
     singular: 'Event',
     apiBase: '/api/events',
     basePath: '/app/events',
+    publicBase: '/events',
     appliesTo: 'event',
     fields: [
       { name: 'title', type: 'text', label: 'Title', required: true },
@@ -160,6 +165,7 @@ export const CONTENT_MODULES = {
     singular: 'Download',
     apiBase: '/api/downloads',
     basePath: '/app/downloads',
+    publicBase: '/downloads',
     appliesTo: 'download',
     titleField: 'name',
     fields: [

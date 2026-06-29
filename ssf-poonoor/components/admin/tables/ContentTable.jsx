@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getModuleConfig } from '@/components/admin/content-configs'
+import ShareBar from '@/components/admin/forms/ShareBar'
 
 const SORTS = [
   { value: 'newest', label: 'Newest' },
@@ -180,6 +181,15 @@ export default function ContentTable({ module, items: initial }) {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {config.publicBase && item.visibility?.isPublished && (
+                        <ShareBar
+                          publicBase={config.publicBase}
+                          slug={item.slug}
+                          title={item[titleField]}
+                          published
+                          compact
+                        />
+                      )}
                       <Link
                         href={`${config.basePath}/${item._id}`}
                         className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"

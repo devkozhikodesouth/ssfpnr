@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { getModuleConfig } from '@/components/admin/content-configs'
 import ContentForm from './ContentForm'
+import ShareBar from './ShareBar'
 
 /**
  * Shared edit screen for every content module. Fetches the item from the
@@ -39,6 +40,16 @@ export default function ContentEditView({ module }) {
         </div>
         {loading && <p className="text-gray-400 text-sm">Loading…</p>}
         {error && <p className="text-red-400 text-sm">{error}</p>}
+        {item && config.publicBase && item.visibility?.isPublished && (
+          <div className="mb-5">
+            <ShareBar
+              publicBase={config.publicBase}
+              slug={item.slug}
+              title={item[config.titleField || 'title']}
+              published
+            />
+          </div>
+        )}
         {item && <ContentForm module={module} initialData={item} />}
       </div>
     </div>

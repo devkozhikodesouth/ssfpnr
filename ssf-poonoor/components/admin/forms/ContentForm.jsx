@@ -152,6 +152,11 @@ export default function ContentForm({ module, initialData = null }) {
   const setField = (name, value) => setForm((prev) => ({ ...prev, [name]: value }))
   const err = (name) => fieldErrors[name]
 
+  // Does this module carry a visibility (draft/publish) field? Drives the
+  // explicit Draft / Publish action buttons below.
+  const hasVisibility = config.fields.some((f) => f.type === 'visibility')
+  const isPublished = !!form.visibility?.isPublished
+
   function handleTitleLikeChange(field, value) {
     setForm((prev) => {
       const next = { ...prev, [field.name]: value }
@@ -161,7 +166,12 @@ export default function ContentForm({ module, initialData = null }) {
     })
   }
 
-  async function handleSubmit(e) {
+  /**
+   * Submit the form. `overridePublish` (true = publish, false = draft) lets the
+   * explicit Draft / Publish buttons set the published state at click time;
+   * undefined keeps whatever the Visibility toggle holds.
+   */
+  async function handleSubmit(e, overridePublish) {
     e.preventDefault()
     setError('')
 
@@ -174,6 +184,15 @@ export default function ContentForm({ module, initialData = null }) {
     }
     setFieldErrors({})
 
+    const payload =
+      typeof overridePublish === 'boolean' && hasVisibility
+        ? { ...form, visibility: { ...form.visibility, isPublished: overridePublish } }
+        : form
+    // Keep the visible toggle in sync so the banner reflects the action taken.
+    if (typeof overridePublish === 'boolean' && hasVisibility) {
+      setForm((prev) => ({ ...prev, visibility: { ...prev.visibility, isPublished: overridePublish } }))
+    }
+
     setLoading(true)
     try {
       const url = isEdit ? `${config.apiBase}/${initialData._id}` : config.apiBase
@@ -181,7 +200,7 @@ export default function ContentForm({ module, initialData = null }) {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -479,27 +498,68 @@ export default function ContentForm({ module, initialData = null }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 bg-gray-900 rounded-xl p-6">
+    <form onSubmit={(e) => handleSubmit(e)} className="space-y-5 bg-gray-900 rounded-xl p-6">
+      {hasVisibility && (
+        <div
+          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium border ${
+            isPublished
+              ? 'bg-emerald-600/10 border-emerald-600/40 text-emerald-300'
+              : 'bg-yellow-500/10 border-yellow-500/40 text-yellow-300'
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${isPublished ? 'bg-emerald-400' : 'bg-yellow-400'}`} />
+          {isPublished ? 'Published — live on the public site' : 'Draft — not visible on the public site'}
+        </div>
+      )}
+
       {config.fields.map(renderField)}
 
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
-      <div className="flex gap-3 pt-1">
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
-        >
-          {loading ? 'Saving…' : isEdit ? `Update ${config.singular}` : `Create ${config.singular}`}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push(config.basePath)}
-          className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
-        >
-          Cancel
-        </button>
-      </div>
+      {hasVisibility ? (
+        <div className="flex flex-col sm:flex-row gap-3 pt-1">
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, true)}
+            disabled={loading}
+            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+          >
+            {loading ? 'Saving…' : isPublished ? 'Update & keep published' : 'Publish now'}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, false)}
+            disabled={loading}
+            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
+          >
+            {isPublished ? 'Unpublish (save as draft)' : 'Save as draft'}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(config.basePath)}
+            className="px-6 py-2 text-gray-400 hover:text-white font-medium rounded-lg transition-colors sm:ml-auto"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div className="flex gap-3 pt-1">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+          >
+            {loading ? 'Saving…' : isEdit ? `Update ${config.singular}` : `Create ${config.singular}`}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(config.basePath)}
+            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </form>
   )
 }

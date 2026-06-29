@@ -7,6 +7,7 @@ import Category from '@/models/Category'
 import { generateUniqueSlug } from '@/lib/slugify'
 import sanitizeCss from '@/lib/css-sanitizer'
 import { logAction } from '@/lib/audit'
+import { revalidateModule } from '@/lib/revalidate-public'
 
 const MAX_CSS_BYTES = 50 * 1024
 
@@ -168,6 +169,7 @@ export function makeCreateHandler({ Model, permissionPrefix, hasCustomCss = fals
 
       const doc = await Model.create(body)
       await logAction(request, { action: 'create', module: permissionPrefix, itemId: doc._id, after: doc })
+      revalidateModule(permissionPrefix)
       return NextResponse.json({ success: true, data: doc }, { status: 201 })
     } catch (err) {
       return errResponse(err)
@@ -228,6 +230,7 @@ export function makeUpdateHandler({ Model, permissionPrefix, hasCustomCss = fals
       await doc.save()
 
       await logAction(request, { action: 'update', module: permissionPrefix, itemId: doc._id, before, after: doc })
+      revalidateModule(permissionPrefix)
       return NextResponse.json({ success: true, data: doc })
     } catch (err) {
       return errResponse(err)
@@ -255,6 +258,7 @@ export function makeDeleteHandler({ Model, permissionPrefix }) {
         itemId: doc._id,
         after: { isDeleted: true, deletedAt: doc.deletedAt, deletedBy: doc.deletedBy },
       })
+      revalidateModule(permissionPrefix)
       return NextResponse.json({ success: true, data: { id: params.id } })
     } catch (err) {
       return errResponse(err)

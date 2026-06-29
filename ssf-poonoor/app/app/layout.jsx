@@ -5,6 +5,20 @@ import AdminShell from '@/components/admin/layout/AdminShell'
 
 export const dynamic = 'force-dynamic'
 
+// Admin pages are an installable PWA in their own right: this overrides the
+// root manifest for every /app route so "Install app" opens the admin (scope
+// /app, launching at the dashboard) rather than the public site. The service
+// worker registered in the root layout already covers /app (scope '/').
+export const metadata = {
+  title: 'SSF Poonoor Admin',
+  manifest: '/admin.webmanifest',
+  appleWebApp: { capable: true, title: 'SSF Admin', statusBarStyle: 'black-translucent' },
+}
+
+export const viewport = {
+  themeColor: '#059669',
+}
+
 /**
  * Shared chrome for the admin panel (/app/*). Resolves the session server-side
  * and feeds AdminShell a permission-filtered nav so roles actually shape the UI.

@@ -37,8 +37,15 @@ export default function CategoryForm({ initialData = null }) {
   })
   const [slugManual, setSlugManual] = useState(isEdit)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
   const [loading, setLoading] = useState(false)
+
+  // "Add this page to the menu bar" (prompt): a standalone category is a public
+  // page at /c/[slug]; this optionally creates a NavPath linking to it so it
+  // shows in the chosen menu. The menu itself stays editable in Path Manage.
+  const [addToMenu, setAddToMenu] = useState(false)
+  const [menuLocation, setMenuLocation] = useState('top-nav')
 
   const err = (name) => fieldErrors[name]
 
@@ -94,6 +101,36 @@ export default function CategoryForm({ initialData = null }) {
       if (!res.ok) {
         setError(data.error || 'Something went wrong')
         return
+      }
+
+      // Optionally add the standalone page to a navigation menu. A failure here
+      // (e.g. missing paths.manage permission) must not lose the saved category,
+      // so we warn and still continue.
+      if (addToMenu && form.isStandalone) {
+        const saved = data.data || form
+        try {
+          const navRes = await fetch('/api/nav-paths', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              label: saved.name,
+              labelMl: '',
+              path: `/c/${saved.slug}`,
+              location: menuLocation,
+              icon: 'tag',
+            }),
+          })
+          if (!navRes.ok) {
+            const navJson = await navRes.json().catch(() => ({}))
+            setNotice(`Category saved, but adding it to the menu failed: ${navJson.error || 'permission denied'}. Add it manually in Path Manage.`)
+            setLoading(false)
+            return
+          }
+        } catch {
+          setNotice('Category saved, but adding it to the menu failed. Add it manually in Path Manage.')
+          setLoading(false)
+          return
+        }
       }
 
       router.push('/app/categories')
@@ -255,6 +292,34 @@ export default function CategoryForm({ initialData = null }) {
         />
       </div>
 
+      {/* Add the standalone page to a navigation menu (editable later in Path Manage). */}
+      {form.isStandalone && (
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 space-y-3">
+          <Switch
+            label="Add this page to the navigation menu"
+            checked={addToMenu}
+            onChange={setAddToMenu}
+          />
+          {addToMenu && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className={label}>Menu location</label>
+                <select value={menuLocation} onChange={(e) => setMenuLocation(e.target.value)} className={input}>
+                  <option value="top-nav">Top navigation</option>
+                  <option value="bottom-nav">Mobile bottom nav</option>
+                  <option value="footer">Footer</option>
+                </select>
+              </div>
+              <p className="text-xs text-gray-400 self-end pb-2">
+                A link to <span className="text-gray-300">/c/{form.slug || 'your-slug'}</span> will be added. Edit
+                labels, order and visibility anytime in <span className="text-emerald-400">Path Manage</span>.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {notice && <p className="text-yellow-300 text-sm">{notice}</p>}
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
       <div className="flex gap-3 pt-1">

@@ -6,6 +6,7 @@ import HeaderEditor from './HeaderEditor'
 import HeroEditor from './HeroEditor'
 import LiveEditor from './LiveEditor'
 import GallerySectionEditor from './GallerySectionEditor'
+import FeaturedCategoriesEditor from './FeaturedCategoriesEditor'
 import AboutEditor from './AboutEditor'
 import AboutPageEditor from './AboutPageEditor'
 import FooterEditor from './FooterEditor'
@@ -20,6 +21,7 @@ const SECTIONS = [
   { key: 'hero', label: 'Hero', kind: 'section', type: 'hero', Editor: HeroEditor, preview: 'home' },
   { key: 'live', label: 'Live', kind: 'section', type: 'live', Editor: LiveEditor, preview: 'home' },
   { key: 'gallery', label: 'Gallery', kind: 'section', type: 'gallery', Editor: GallerySectionEditor, preview: 'home' },
+  { key: 'categories', label: 'Featured Categories', kind: 'section', type: 'categories', Editor: FeaturedCategoriesEditor, preview: 'home' },
   { key: 'about', label: 'About (home)', kind: 'section', type: 'about', Editor: AboutEditor, preview: 'home' },
   { key: 'aboutPage', label: 'About Page', kind: 'branch', branch: 'about', Editor: AboutPageEditor, preview: 'about' },
   { key: 'footer', label: 'Footer', kind: 'branch', branch: 'footer', Editor: FooterEditor, preview: 'home' },

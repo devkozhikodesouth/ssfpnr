@@ -28,6 +28,14 @@ export default function MobileMenu({ navItems = [], siteName = 'SSF Poonoor', lo
     setSearchOpen(false)
   }, [pathname])
 
+  // The bottom-nav "More" button lives in a separate component; it asks us to
+  // open the drawer via this window event (see BottomNav.jsx).
+  useEffect(() => {
+    const open = () => setMenuOpen(true)
+    window.addEventListener('ssf:open-menu', open)
+    return () => window.removeEventListener('ssf:open-menu', open)
+  }, [])
+
   // Lock body scroll while an overlay is open.
   useEffect(() => {
     const open = menuOpen || searchOpen
