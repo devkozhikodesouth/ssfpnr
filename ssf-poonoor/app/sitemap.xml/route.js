@@ -27,14 +27,20 @@ export async function GET() {
     ['events', 'sitemap-events.xml'],
     ['video', 'sitemap-videos.xml'],
     ['gallery', 'sitemap-gallery.xml'],
+    ['campaigns', 'sitemap-campaigns.xml'],
   ]
     .filter(([key]) => enabled(key))
-    .map(([, file]) => ({ loc: `${base}/${file}`, lastmod: new Date() }))
+    .map(([, file]) => ({ loc: `${base}/${file}` }))
 
+  // No <lastmod> on the index entries: this route is dynamic, so `new Date()`
+  // reported "just changed" on every single fetch. An always-now lastmod is a
+  // signal crawlers learn to distrust, which is worse than sending none — the
+  // real per-URL lastmod still lives in each sub-sitemap. sitemapIndexXml omits
+  // the tag when the date is absent.
   const sitemaps = [
-    { loc: `${base}/sitemap-static.xml`, lastmod: new Date() },
+    { loc: `${base}/sitemap-static.xml` },
     ...moduleSitemaps,
-    { loc: `${base}/sitemap-categories.xml`, lastmod: new Date() },
+    { loc: `${base}/sitemap-categories.xml` },
   ]
 
   return xmlResponse(sitemapIndexXml(sitemaps), publicCacheControl())

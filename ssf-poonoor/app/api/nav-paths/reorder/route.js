@@ -6,6 +6,7 @@ import { errorResponse, httpError } from '@/lib/api-errors'
 import { logAction } from '@/lib/audit'
 import connectDB from '@/lib/db'
 import NavPath from '@/models/NavPath'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,6 +33,8 @@ export async function PUT(request) {
     )
 
     await logAction(request, { action: 'reorder', module: 'nav-paths', itemId: null, after: { order } })
+
+    revalidateSiteConfig()
 
     const paths = await NavPath.find({ _id: { $in: order } }).sort({ order: 1 }).lean()
     return NextResponse.json({ success: true, data: paths })

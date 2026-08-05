@@ -6,8 +6,15 @@ import JsonLd from '@/components/public/seo/JsonLd'
 import GoogleAnalytics from '@/components/public/seo/GoogleAnalytics'
 import { getSiteConfig, getPrimaryNav, getBottomNav, getNavPaths } from '@/lib/public-content'
 import { buildJsonLd } from '@/lib/seo'
+import { REVALIDATE_SECONDS } from '@/lib/perf'
 
-export const dynamic = 'force-dynamic'
+// ISR rather than force-dynamic. Route segment config cascades to children, so
+// `force-dynamic` here previously overrode the `revalidate` exports on every
+// detail page and made each crawler hit a cold MongoDB round-trip (on an
+// auto-pausing free-tier Atlas cluster) — slow, unreliable TTFB directly
+// suppresses Google's crawl rate. Admin edits still appear instantly because
+// every SiteConfig / nav / font write calls revalidateSiteConfig().
+export const revalidate = REVALIDATE_SECONDS
 
 /**
  * Public route-group shell (PLAN §15). Reads SiteConfig + nav-paths ONCE on the

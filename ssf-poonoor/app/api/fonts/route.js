@@ -8,6 +8,7 @@ import { buildFontFace } from '@/lib/font-face'
 import { uploadRaw } from '@/lib/cloudinary'
 import connectDB from '@/lib/db'
 import Font from '@/models/Font'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -101,6 +102,8 @@ export async function POST(request) {
       createdBy: session.user.id,
       updatedBy: session.user.id,
     })
+
+    revalidateSiteConfig()
 
     const safe = doc.toObject()
     delete safe.cloudinaryIds

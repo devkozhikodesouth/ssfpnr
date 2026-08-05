@@ -38,3 +38,23 @@ export function revalidateModule(permissionPrefix) {
     // best-effort; ignore (e.g. called outside a request scope)
   }
 }
+
+/**
+ * Purge every public page after a site-wide config change (SiteConfig, nav
+ * paths, fonts). These feed the public layout's chrome — navbar, footer, bottom
+ * nav, theme and typography — plus the homepage sections and the About page, so
+ * a change to any of them can surface anywhere on the site.
+ *
+ * The public layout used to be `force-dynamic`, which made these edits appear
+ * instantly at the cost of a DB round-trip on every request (including every
+ * crawler hit). It now uses ISR, so the purge here is what preserves the
+ * no-delay admin experience.
+ */
+export function revalidateSiteConfig() {
+  try {
+    // 'layout' at '/' cascades to every route beneath the root layout.
+    revalidatePath('/', 'layout')
+  } catch {
+    // best-effort; ignore (e.g. called outside a request scope)
+  }
+}

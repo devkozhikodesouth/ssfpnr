@@ -25,11 +25,43 @@ export const MODULE_SCHEMA_TYPE = {
   campaigns: 'Article',
 }
 
-/** Absolute origin for canonical/OG/sitemap URLs (no trailing slash). */
+// Warn once per process rather than on every request — getBaseUrl() is called
+// many times per page render (canonical, OG, JSON-LD, every sitemap <loc>).
+let warnedMissingOrigin = false
+
+/**
+ * Absolute origin for canonical/OG/sitemap URLs (no trailing slash).
+ *
+ * The origin resolved here ends up in EVERY canonical tag, sitemap <loc>, JSON-LD
+ * `url` and the robots.txt `Sitemap:` line — so getting it wrong silently
+ * de-indexes the whole site (Google drops pages whose canonical points at an
+ * unreachable origin, and Search Console rejects a sitemap whose URLs are on a
+ * different domain). Hence the Vercel-provided fallbacks: if the env vars are
+ * ever missed on a deploy we still emit the real deployment origin instead of
+ * localhost, and localhost is only ever used outside production.
+ */
 export function getBaseUrl() {
-  const raw =
-    process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  return raw.replace(/\/+$/, '')
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL
+  if (fromEnv) return fromEnv.replace(/\/+$/, '')
+
+  // VERCEL_PROJECT_PRODUCTION_URL is the production alias and stays correct even
+  // when this code runs inside a preview build; VERCEL_URL is the per-deployment
+  // host. Both are bare hostnames, so they need the scheme prepended.
+  const fromVercel =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+  if (fromVercel) return `https://${fromVercel}`.replace(/\/+$/, '')
+
+  if (process.env.NODE_ENV === 'production' && !warnedMissingOrigin) {
+    warnedMissingOrigin = true
+    console.error(
+      '[seo] NEXT_PUBLIC_SITE_URL is not set in production. Canonical URLs, ' +
+        'sitemaps and JSON-LD will fall back to http://localhost:3000, which ' +
+        'keeps the site out of Google. Set it (and NEXTAUTH_URL) to the real ' +
+        'production origin and redeploy.'
+    )
+  }
+
+  return 'http://localhost:3000'
 }
 
 /** Make any (possibly relative) URL absolute against the site origin. */

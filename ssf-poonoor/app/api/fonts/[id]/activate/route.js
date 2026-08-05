@@ -6,6 +6,7 @@ import { errorResponse, httpError } from '@/lib/api-errors'
 import { syncFontAssignment, ROLE_KEYS } from '@/lib/font-assignment'
 import connectDB from '@/lib/db'
 import Font from '@/models/Font'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +43,8 @@ export async function PUT(request, { params }) {
     font.isActive = isActive
     font.updatedBy = session.user.id
     await syncFontAssignment(font, assignedTo) // saves font + mirrors to SiteConfig
+
+    revalidateSiteConfig()
 
     const safe = font.toObject()
     delete safe.cloudinaryIds

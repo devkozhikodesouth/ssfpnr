@@ -7,6 +7,7 @@ import { releaseFontFromConfig } from '@/lib/font-assignment'
 import { deleteAsset } from '@/lib/cloudinary'
 import connectDB from '@/lib/db'
 import Font from '@/models/Font'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,6 +47,9 @@ export async function DELETE(_request, { params }) {
     }
 
     await Font.findByIdAndDelete(font._id)
+
+    revalidateSiteConfig()
+
     return NextResponse.json({ success: true, data: { id: params.id } })
   } catch (err) {
     return errorResponse(err)

@@ -7,7 +7,11 @@ import Newsletter from '@/components/public/home/Newsletter'
 import JsonLd from '@/components/public/seo/JsonLd'
 import { getSiteConfig } from '@/lib/public-content'
 import { buildMetadata, getBaseUrl } from '@/lib/seo'
-
+// Stays dynamic deliberately. As a parameterless route, `revalidate` here would
+// make Next prerender it at build time, which needs a reachable MongoDB during
+// `next build` — and the free-tier Atlas cluster auto-pauses, so that would let
+// an unrelated DB outage fail the deploy. The detail pages (the bulk of the
+// indexable URLs) get real ISR via the public layout instead.
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata() {

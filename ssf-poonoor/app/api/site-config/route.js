@@ -7,6 +7,7 @@ import { deepMerge } from '@/lib/deep-merge'
 import { logAction } from '@/lib/audit'
 import connectDB from '@/lib/db'
 import SiteConfig from '@/models/SiteConfig'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -73,6 +74,10 @@ export async function PUT(request) {
       itemId: config._id,
       after: config,
     })
+
+    // SiteConfig drives the public chrome, homepage sections and About page,
+    // which are ISR-cached — purge so admin edits show up immediately.
+    revalidateSiteConfig()
 
     return NextResponse.json({ success: true, data: config })
   } catch (err) {

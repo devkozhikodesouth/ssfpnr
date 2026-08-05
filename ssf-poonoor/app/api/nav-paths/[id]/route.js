@@ -6,6 +6,7 @@ import { errorResponse, httpError } from '@/lib/api-errors'
 import { logAction } from '@/lib/audit'
 import connectDB from '@/lib/db'
 import NavPath from '@/models/NavPath'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,6 +55,8 @@ export async function PUT(request, { params }) {
 
     await logAction(request, { action: 'update', module: 'nav-paths', itemId: doc._id, before, after: doc })
 
+    revalidateSiteConfig()
+
     return NextResponse.json({ success: true, data: doc })
   } catch (err) {
     return errorResponse(err)
@@ -73,6 +76,8 @@ export async function DELETE(request, { params }) {
     await NavPath.findByIdAndDelete(doc._id)
 
     await logAction(request, { action: 'delete', module: 'nav-paths', itemId: params.id, before })
+
+    revalidateSiteConfig()
 
     return NextResponse.json({ success: true, data: { id: params.id } })
   } catch (err) {

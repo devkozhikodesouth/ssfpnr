@@ -6,7 +6,8 @@ import JsonLd from '@/components/public/seo/JsonLd'
 import { getSiteConfig } from '@/lib/public-content'
 import { buildMetadata, buildJsonLd } from '@/lib/seo'
 import { typeStyle } from '@/lib/typography'
-
+// Dynamic for the same reason as the home page: a parameterless ISR route would
+// be prerendered at build time and couple `next build` to DB availability.
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata() {

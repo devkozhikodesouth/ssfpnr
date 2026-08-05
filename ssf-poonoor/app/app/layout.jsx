@@ -13,6 +13,10 @@ export const metadata = {
   title: 'SSF Poonoor Admin',
   manifest: '/admin.webmanifest',
   appleWebApp: { capable: true, title: 'SSF Admin', statusBarStyle: 'black-translucent' },
+  // robots.txt already disallows /app/, but that only stops crawling — a URL
+  // discovered elsewhere (a shared link, a backlink) can still be indexed
+  // without being fetched. The meta tag is what actually keeps admin out.
+  robots: { index: false, follow: false },
 }
 
 export const viewport = {

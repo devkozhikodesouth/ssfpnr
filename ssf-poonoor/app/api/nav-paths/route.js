@@ -6,6 +6,7 @@ import { errorResponse, httpError } from '@/lib/api-errors'
 import { logAction } from '@/lib/audit'
 import connectDB from '@/lib/db'
 import NavPath from '@/models/NavPath'
+import { revalidateSiteConfig } from '@/lib/revalidate-public'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,6 +64,8 @@ export async function POST(request) {
     })
 
     await logAction(request, { action: 'create', module: 'nav-paths', itemId: doc._id, after: doc })
+
+    revalidateSiteConfig()
 
     return NextResponse.json({ success: true, data: doc }, { status: 201 })
   } catch (err) {
